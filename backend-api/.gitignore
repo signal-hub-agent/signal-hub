@@ -1,0 +1,50 @@
+﻿# IDE/editor
+.idea/
+.vscode/
+*.iml
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# Logs and runtime files
+*.log
+logs/
+*.pid
+
+# Environment and secrets
+.env
+.env.*
+!.env.example
+*.pem
+*.key
+
+# Python
+__pycache__/
+*.py[cod]
+.venv/
+venv/
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+
+# Java / Maven / Gradle
+/target/
+build/
+.gradle/
+
+# Node
+node_modules/
+dist/
+coverage/
+
+# Data/output artifacts
+*.parquet
+*.orc
+*.avro
+*.csv
+*.tsv
+*.xlsx
+*.db
+*.sqlite
+*.sqlite3
