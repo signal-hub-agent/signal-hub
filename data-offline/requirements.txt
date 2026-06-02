@@ -1,0 +1,4 @@
+pandas==2.1.1
+clickhouse-driver==0.2.6
+eth-utils==2.2.2
+python-dotenv==1.0.0

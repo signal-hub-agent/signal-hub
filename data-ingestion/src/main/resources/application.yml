@@ -1,0 +1,18 @@
+spring:
+  application:
+    name: signal-forge-ingestion
+  kafka:
+    bootstrap-servers: localhost:9092
+    producer:
+      key-serializer: org.apache.kafka.common.serialization.StringSerializer
+      value-serializer: org.apache.kafka.common.serialization.StringSerializer
+      retries: 3
+      acks: 1
+
+web3j:
+  client-address: https://rpc.mantle.xyz
+
+app:
+  kafka:
+    topic:
+      raw-logs: signal-forge-raw-logs
