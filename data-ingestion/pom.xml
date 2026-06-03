@@ -10,8 +10,8 @@
         <version>3.1.5</version> <relativePath/>
     </parent>
 
-    <groupId>com.signalforge</groupId>
-    <artifactId>signalforge-ingestion</artifactId>
+    <groupId>com.signalhub</groupId>
+    <artifactId>signalhub-ingestion</artifactId>
     <version>1.0-SNAPSHOT</version>
 
     <properties>

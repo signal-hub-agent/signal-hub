@@ -1,6 +1,6 @@
-package com.signalforge.flink.sink;
+package com.signalhub.flink.sink;
 
-import com.signalforge.flink.entity.RawLog;
+import com.signalhub.flink.entity.RawLog;
 import org.apache.flink.connector.jdbc.JdbcConnectionOptions;
 import org.apache.flink.connector.jdbc.JdbcExecutionOptions;
 import org.apache.flink.connector.jdbc.JdbcSink;
@@ -14,7 +14,7 @@ import java.sql.Timestamp;
 public class ClickHouseSinkFactory {
 
     private static final String INSERT_SQL =
-            "INSERT INTO signal_forge.raw_logs " +
+            "INSERT INTO signal_hub.raw_logs " +
                     "(chain_name, block_number, block_timestamp, tx_hash, log_index, contract_address, topic0, topic1, topic2, topic3, data) " +
                     "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
 

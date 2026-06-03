@@ -1,8 +1,8 @@
-package com.signalforge.ingestion.producer;
+package com.signalhub.ingestion.producer;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.signalforge.ingestion.entity.RawLog;
+import com.signalhub.ingestion.entity.RawLog;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;

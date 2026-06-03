@@ -1,4 +1,4 @@
-package com.signalforge.flink.entity;
+package com.signalhub.flink.entity;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import lombok.AllArgsConstructor;

@@ -1,6 +1,6 @@
 spring:
   application:
-    name: signal-forge-ingestion
+    name: signal-hub-ingestion
   kafka:
     bootstrap-servers: localhost:9092
     producer:
@@ -15,4 +15,4 @@ web3j:
 app:
   kafka:
     topic:
-      raw-logs: signal-forge-raw-logs
+      raw-logs: signal-hub-raw-logs

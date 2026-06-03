@@ -1,7 +1,7 @@
-package com.signalforge.ingestion.service;
+package com.signalhub.ingestion.service;
 
-import com.signalforge.ingestion.entity.RawLog;
-import com.signalforge.ingestion.producer.RawLogKafkaProducer;
+import com.signalhub.ingestion.entity.RawLog;
+import com.signalhub.ingestion.producer.RawLogKafkaProducer;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
