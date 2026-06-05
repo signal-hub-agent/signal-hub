@@ -1,8 +1,10 @@
--- 【铜层 ODS】存储 Bybit API 原始 K 线 JSON
+-- [Bronze ODS] Raw Bybit Klines
 CREATE TABLE IF NOT EXISTS signal_hub.raw_klines (
     token_symbol String,
     interval String,
     raw_json String,
     fetch_timestamp DateTime DEFAULT now()
-) ENGINE = ReplacingMergeTree()
+) ENGINE = ReplacingMergeTree(fetch_timestamp)
+-- Partition by Month since Kline data volume per symbol is relatively small
+PARTITION BY toYYYYMM(fetch_timestamp)
 ORDER BY (token_symbol, interval, fetch_timestamp);

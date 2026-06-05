@@ -32,6 +32,8 @@ venv/
 /target/
 build/
 .gradle/
+target/
+*.class
 
 # Node
 node_modules/
@@ -48,3 +50,6 @@ coverage/
 *.db
 *.sqlite
 *.sqlite3
+
+**/infra/docker/*_data/
+**/infra/docker/*_log/

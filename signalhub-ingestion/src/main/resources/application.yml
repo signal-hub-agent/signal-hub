@@ -1,0 +1,23 @@
+spring:
+  application:
+    name: signal-hub-ingestion
+  kafka:
+    bootstrap-servers: localhost:9092
+    producer:
+      key-serializer: org.apache.kafka.common.serialization.StringSerializer
+      value-serializer: org.apache.kafka.common.serialization.StringSerializer
+      retries: 3
+      # Increase acks to all for data reliability
+      acks: all
+
+web3j:
+  client-address: https://rpc.mantle.xyz
+
+app:
+  mantle:
+    # Sync start block for historical backfill (replace with max block_number from Dune data)
+    # Set to -1 to consume from LATEST
+    sync-start-block: 95903989
+  kafka:
+    topic:
+      raw-logs: signal-hub-raw-logs

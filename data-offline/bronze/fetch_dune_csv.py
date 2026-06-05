@@ -1,5 +1,6 @@
 import os
 import logging
+import pandas as pd  # 🌟 修复 1：必须显式引入 pandas
 from pathlib import Path
 from dune_client.client import DuneClient
 
@@ -9,8 +10,8 @@ logging.basicConfig(
 )
 logger = logging.getLogger('DuneBronzeFetcher')
 
-DUNE_API_KEY = os.getenv("DUNE_API_KEY", "")
-QUERY_ID = 7595616
+DUNE_API_KEY = os.getenv("DUNE_API_KEY", "J9a0r5DkWP3O0AhzTlPUGdsNEnEg1WmV")
+QUERY_ID = 7656786
 
 # Resolve paths to ensure script can be run from anywhere
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -31,11 +32,20 @@ def fetch_and_store_dune_data():
     dune = DuneClient(DUNE_API_KEY)
 
     try:
-        df = dune.get_latest_result_dataframe(QUERY_ID)
+        response = dune.get_latest_result(QUERY_ID)
 
-        if df.empty:
+        if hasattr(response, 'result') and hasattr(response.result, 'rows'):
+            rows = response.result.rows  # 旧版本结构
+        elif hasattr(response, 'rows'):
+            rows = response.rows         # 新版本结构
+        else:
+            rows = response              # 如果直接返回了列表
+
+        if not rows:
             logger.warning("Dune query returned an empty dataset.")
             return
+
+        df = pd.DataFrame(rows)
 
         DATA_DIR.mkdir(parents=True, exist_ok=True)
         df.to_csv(CSV_PATH, index=False)

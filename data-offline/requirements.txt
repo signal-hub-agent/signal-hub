@@ -1,3 +1,5 @@
 pandas==2.1.1
 clickhouse-driver==0.2.6
 dune-client==1.2.1
+numpy<2.0.0
+psycopg2-binary

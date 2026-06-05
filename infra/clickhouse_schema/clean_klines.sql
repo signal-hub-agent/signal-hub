@@ -1,4 +1,4 @@
--- 【银层 DWD】标准化 K 线时间序列
+-- [Silver DWD] Standardized Kline Time Series
 CREATE TABLE IF NOT EXISTS signal_hub.clean_klines (
     token_symbol String,
     interval String,
@@ -12,4 +12,5 @@ CREATE TABLE IF NOT EXISTS signal_hub.clean_klines (
     source String DEFAULT 'bybit',
     updated_at DateTime DEFAULT now()
 ) ENGINE = ReplacingMergeTree(updated_at)
+PARTITION BY toYYYYMM(open_time)
 ORDER BY (token_symbol, interval, open_time);

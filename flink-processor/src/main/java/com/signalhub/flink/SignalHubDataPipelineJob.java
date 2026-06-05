@@ -26,8 +26,9 @@ public class SignalHubDataPipelineJob {
         LOG.info("Initializing SignalHub Flink pipeline environment.");
 
         final StreamExecutionEnvironment env = StreamExecutionEnvironment.getExecutionEnvironment();
+        env.setParallelism(2);
 
-        // Configure checkpointing for fault tolerance
+        // Configure checkpointing for fault tolerance (60 seconds)
         env.enableCheckpointing(60000);
 
         String brokers = "localhost:9092";
@@ -42,21 +43,28 @@ public class SignalHubDataPipelineJob {
                 .setValueOnlyDeserializer(new SimpleStringSchema())
                 .build();
 
-        DataStream<String> kafkaStream = env.fromSource(source, WatermarkStrategy.noWatermarks(), "Kafka Source");
+        DataStream<String> kafkaStream = env.fromSource(source, WatermarkStrategy.noWatermarks(), "Kafka Source")
+                .uid("kafka-source");
 
         SingleOutputStreamOperator<RawLog> rawLogStream = kafkaStream.map(json -> {
-            try {
-                return OBJECT_MAPPER.readValue(json, RawLog.class);
-            } catch (Exception e) {
-                LOG.error("Failed to deserialize Kafka message: {}", json, e);
-                return null;
-            }
-        }).filter(log -> log != null);
+                    try {
+                        return OBJECT_MAPPER.readValue(json, RawLog.class);
+                    } catch (Exception e) {
+                        LOG.error("Failed to deserialize Kafka message: {}", json, e);
+                        return null;
+                    }
+                })
+                .name("Deserialize JSON")
+                .uid("deserialize-json")
+                .filter(log -> log != null)
+                .name("Filter Nulls")
+                .uid("filter-nulls");
 
-        String chUrl = "jdbc:clickhouse://localhost:8123/signal_hub";
+        String chUrl = "jdbc:clickhouse://localhost:8123/signal_hub?socket_timeout=60000&connection_timeout=60000";
 
         rawLogStream.addSink(ClickHouseSinkFactory.createRawLogSink(chUrl, "default", ""))
-                .name("ClickHouse ODS Sink");
+                .name("ClickHouse ODS Sink")
+                .uid("clickhouse-sink");
 
         LOG.info("Executing SignalHub Flink pipeline.");
         env.execute("SignalHub RawLog Ingestion Job");
