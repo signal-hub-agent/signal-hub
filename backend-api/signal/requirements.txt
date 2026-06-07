@@ -1,0 +1,7 @@
+pandas
+ta
+requests
+fastapi
+uvicorn
+clickhouse-connect
+anthropic
