@@ -5,3 +5,8 @@ fastapi
 uvicorn
 clickhouse-connect
 anthropic
+
+pydantic-settings
+asyncpg
+redis
+clickhouse-driver
