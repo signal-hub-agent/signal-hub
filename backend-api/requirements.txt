@@ -1,0 +1,12 @@
+# Web Framework & Server
+fastapi
+uvicorn
+
+# Database Clients
+clickhouse-connect
+asyncpg
+redis
+
+# Configurations & External Calls
+pydantic-settings
+requests

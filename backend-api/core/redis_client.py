@@ -27,7 +27,7 @@ class RedisManager:
             await self.client.close()
             logger.info("Redis connection closed.")
 
-    def get_client(self) -> redis.Redis:
+    def get_redis_client(self) -> redis.Redis:
         if not self.client:
             logger.warning("Redis client accessed before initialization.")
         return self.client

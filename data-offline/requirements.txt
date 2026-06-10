@@ -1,5 +1,13 @@
+# Data Processing & Quant
 pandas==2.1.1
-clickhouse-driver==0.2.6
-dune-client==1.2.1
 numpy<2.0.0
+ta
+
+# Database Clients
+clickhouse-driver==0.2.6
+clickhouse-connect  # 如果离线脚本中也复用了 connect 语法，建议加上
 psycopg2-binary
+
+# External APIs
+dune-client==1.2.1
+requests

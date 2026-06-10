@@ -8,7 +8,7 @@ class Settings(BaseSettings):
 
     # ClickHouse Configuration
     CH_HOST: str = os.getenv("CH_HOST", "localhost")
-    CH_PORT: int = int(os.getenv("CH_PORT", 9000))
+    CH_PORT: int = int(os.getenv("CH_PORT", 8123))
     CH_USER: str = os.getenv("CH_USER", "default")
     CH_PASSWORD: str = os.getenv("CH_PASSWORD", "")
     CH_DATABASE: str = os.getenv("CH_DATABASE", "signal_hub")

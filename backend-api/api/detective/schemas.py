@@ -1,5 +1,5 @@
 from pydantic import BaseModel, Field
-from typing import List, Optional
+from typing import List, Optional, Dict, Any
 from datetime import datetime
 
 # ==========================================
@@ -17,6 +17,10 @@ class FinancialMetrics(BaseModel):
     sharpe_ratio: float = Field(..., description="Sharpe ratio, >1.5 is excellent")
     max_drawdown: float = Field(..., description="Max drawdown percentage")
     account_growth_30d: float = Field(..., description="30-day account growth percentage")
+    # --- 新增：对齐底层的统计字段 ---
+    total_trades_30d: int = Field(default=0, description="Total swap executions in 30 days")
+    total_volume_usd: float = Field(default=0.0, description="Total volume in USD")
+    active_days_30d: int = Field(default=0, description="Distinct active trading days")
 
 class RiskAssessment(BaseModel):
     risk_level: str = Field(..., description="GREEN, YELLOW, or RED")
@@ -35,6 +39,9 @@ class AddressDetailResponse(BaseModel):
     portfolio: List[TokenBalance] = Field(default_factory=list)
     risk: RiskAssessment
     last_active: datetime
+    # --- 新增：承载 Redis 中的 LLM 分析报告与数据来源 ---
+    llm_analysis: Optional[Dict[str, Any]] = Field(default=None, description="LLM report fetched from Redis cache")
+    data_source: str = Field(default="gold_precomputed", description="Indicator of where the data came from")
 
 class Top100ListItem(BaseModel):
     address: str
@@ -63,8 +70,6 @@ class TopologyGraphResponse(BaseModel):
     nodes: List[TopologyNode]
     edges: List[TopologyEdge]
 
-# ==========================================
-# Requests (Input from Frontend)
-# ==========================================
 class SubscribeRequest(BaseModel):
-    target_address: str = Field(..., min_length=42, max_length=42, description="The EVM address to subscribe to")
+    target_address: str = Field(..., description="The address to subscribe to for real-time alerts")
+    # 可选扩展：订阅阈值等

@@ -1,5 +1,5 @@
 """
-K线数据拉取 - Bybit API
+K线数据拉取 - Bybit API (离线数据工程工具)
 免费接口，无需API Key
 支持1h / 4h / 日线
 """
@@ -31,11 +31,10 @@ SYMBOL_MAP = {
     "MOE":   "MOEUSDT",
 }
 
-
 def fetch_klines(
-    token_symbol: str,
-    interval: Literal["1h", "4h", "1d"] = "1h",
-    limit: int = 200,
+        token_symbol: str,
+        interval: Literal["1h", "4h", "1d"] = "1h",
+        limit: int = 200,
 ) -> pd.DataFrame:
     """
     从Bybit拉取K线数据
@@ -66,13 +65,8 @@ def fetch_klines(
 
     df = pd.DataFrame(raw, columns=["open_time", "open", "high", "low", "close", "volume", "turnover"])
     for col in ["open", "high", "low", "close", "volume"]:
-        df[col] = pd.to_numeric(df[col])
-    df["open_time"] = pd.to_datetime(pd.to_numeric(df["open_time"]), unit="ms")
+        df[col] = df[col].astype(float)
 
-    # Bybit返回从新到旧，翻转成从旧到新
-    df = df.iloc[::-1].reset_index(drop=True)
-    return df[["open_time", "open", "high", "low", "close", "volume"]]
-
-
-def get_supported_tokens() -> list:
-    return list(SYMBOL_MAP.keys())
+    df["open_time"] = pd.to_numeric(df["open_time"])
+    df = df.sort_values("open_time").reset_index(drop=True)
+    return df
