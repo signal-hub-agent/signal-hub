@@ -1,9 +1,8 @@
 import os
 import sys
 
-# 🌟 动态将 data-offline 目录加入系统路径，解决 config 导入问题
 current_dir = os.path.dirname(os.path.abspath(__file__))
-parent_dir = os.path.dirname(current_dir)
+parent_dir = os.path.dirname(os.path.dirname(current_dir))
 sys.path.append(parent_dir)
 
 import json
@@ -12,6 +11,7 @@ from datetime import datetime
 import pandas as pd
 from config.database import get_clickhouse_client
 
+logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
 logger = logging.getLogger(__name__)
 
 
@@ -21,7 +21,7 @@ def process_raw_klines_to_silver():
     try:
         raw_data = client.execute("""
             SELECT token_symbol, interval, raw_json 
-            FROM raw_klines 
+            FROM signal_hub.raw_klines 
             WHERE fetch_timestamp >= now() - INTERVAL 1 HOUR
         """)
 
@@ -56,7 +56,7 @@ def process_raw_klines_to_silver():
 
         if clean_records:
             client.execute("""
-                INSERT INTO clean_klines (
+                INSERT INTO signal_hub.clean_klines (
                     token_symbol, interval, open_time, open, high, low, close, volume, turnover, source, updated_at
                 ) VALUES
             """, clean_records)

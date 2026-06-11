@@ -10,13 +10,11 @@ import org.apache.flink.connector.kafka.source.enumerator.initializer.OffsetsIni
 import org.apache.flink.streaming.api.datastream.DataStream;
 import org.apache.flink.streaming.api.datastream.SingleOutputStreamOperator;
 import org.apache.flink.streaming.api.environment.StreamExecutionEnvironment;
+import org.apache.flink.streaming.api.environment.CheckpointConfig;
+import org.apache.flink.core.fs.Path;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-/**
- * Main Flink job for SignalHub data ingestion.
- * Consumes raw logs from Kafka and sinks them into ClickHouse ODS.
- */
 public class SignalHubDataPipelineJob {
 
     private static final Logger LOG = LoggerFactory.getLogger(SignalHubDataPipelineJob.class);
@@ -28,18 +26,30 @@ public class SignalHubDataPipelineJob {
         final StreamExecutionEnvironment env = StreamExecutionEnvironment.getExecutionEnvironment();
         env.setParallelism(2);
 
-        // Configure checkpointing for fault tolerance (60 seconds)
+        // 🌟 1. 启用 Checkpointing (每 60 秒触发一次)
         env.enableCheckpointing(60000);
 
-        String brokers = "localhost:9092";
+        // 🌟 2. 【核心修复】设置 Checkpoint 的持久化路径！
+        // 如果没有这一行，状态只会保存在内存中，重启就丢了。在 Docker 中可以映射此目录。
+        env.getCheckpointConfig().setCheckpointStorage(new Path("file:///tmp/flink-checkpoints/signalhub"));
+
+        // 🌟 3. 设置任务即使被手动 Cancel，也要保留最后的 Checkpoint 文件
+        env.getCheckpointConfig().setExternalizedCheckpointCleanup(
+                CheckpointConfig.ExternalizedCheckpointCleanup.RETAIN_ON_CANCELLATION
+        );
+
+        String brokers = "localhost:9092"; // Docker 环境下可能是 kafka:29092
         String topic = "signal-hub-raw-logs";
         String consumerGroup = "flink-ods-consumer-group";
 
+        // 🌟 4. 【核心修复】改变 Offset 初始化策略
+        // committedOffsets 表示：优先从 Kafka Consumer Group 提交的进度开始读。
+        // OffsetResetStrategy.EARLIEST 表示：如果这是全新启动（查不到进度），才从最老的数据开始读。
         KafkaSource<String> source = KafkaSource.<String>builder()
                 .setBootstrapServers(brokers)
                 .setTopics(topic)
                 .setGroupId(consumerGroup)
-                .setStartingOffsets(OffsetsInitializer.earliest())
+                .setStartingOffsets(OffsetsInitializer.committedOffsets(org.apache.kafka.clients.consumer.OffsetResetStrategy.EARLIEST))
                 .setValueOnlyDeserializer(new SimpleStringSchema())
                 .build();
 

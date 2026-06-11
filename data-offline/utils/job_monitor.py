@@ -9,7 +9,7 @@ def update_job_start(job_name: str, cron_expr: str, watermark: datetime, next_ex
     Marks a job as RUNNING and updates the execution physical time.
     """
     query = """
-        INSERT INTO sys_job_watermarks 
+        INSERT INTO signal_hub.sys_job_watermarks 
             (job_name, cron_expression, watermark, last_execution_time, next_execution_time, status, updated_at)
         VALUES 
             (%s, %s, %s, %s, %s, 'RUNNING', CURRENT_TIMESTAMP)
@@ -35,7 +35,7 @@ def update_job_end(job_name: str, status: str, error_msg: str = ""):
     Marks a job as SUCCESS or FAILED.
     """
     query = """
-        UPDATE sys_job_watermarks 
+        UPDATE signal_hub.sys_job_watermarks 
         SET status = %s, error_msg = %s, updated_at = CURRENT_TIMESTAMP
         WHERE job_name = %s;
     """
@@ -52,7 +52,7 @@ def record_system_alert(alert_type: str, message: str):
     """
     Records a critical system alert for the monitoring dashboard.
     """
-    query = "INSERT INTO sys_alerts (alert_type, alert_message) VALUES (%s, %s);"
+    query = "INSERT INTO signal_hub.sys_alerts (alert_type, alert_message) VALUES (%s, %s);"
     try:
         client = get_pg_client()
         with client.cursor() as cursor:

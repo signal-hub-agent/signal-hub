@@ -5,6 +5,8 @@ import com.signalhub.ingestion.producer.RawLogKafkaProducer;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.dao.EmptyResultDataAccessException;
+import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Service;
 import org.web3j.protocol.Web3j;
 import org.web3j.protocol.core.DefaultBlockParameter;
@@ -36,7 +38,6 @@ public class MantleIngestionService {
     private static final String V3_SWAP_TOPIC = "0xc42079f94a6350d7e6235f29174924f928cc2ac818eb64fed8004e115fbcca67";
 
     private static final int BLOCK_TIMESTAMP_CACHE_SIZE = 1000;
-    // Define the maximum chunk size for historical sync to avoid RPC 503 errors
     private static final long BLOCK_CHUNK_SIZE = 2000L;
 
     @Value("${app.mantle.sync-start-block:-1}")
@@ -44,8 +45,13 @@ public class MantleIngestionService {
 
     private final Web3j web3j;
     private final RawLogKafkaProducer kafkaProducer;
+    private final JdbcTemplate jdbcTemplate; // 🌟 引入 PG 操作模板
+
     private final AtomicBoolean isRunning = new AtomicBoolean(false);
     private Disposable subscription;
+
+    // 🌟 用于控制只在区块切换时写库，避免击穿 PG
+    private volatile long lastSavedBlock = 0;
 
     private final Map<BigInteger, Long> blockTimestampCache = Collections.synchronizedMap(
             new LinkedHashMap<BigInteger, Long>(BLOCK_TIMESTAMP_CACHE_SIZE, 0.75f, true) {
@@ -60,8 +66,6 @@ public class MantleIngestionService {
     public void startIngestion() {
         if (isRunning.compareAndSet(false, true)) {
             log.info("Starting Mantle log ingestion service.");
-
-            // Start the ingestion process in a separate thread to avoid blocking Spring Boot startup
             new Thread(this::runIngestionPipeline, "Ingestion-Pipeline-Thread").start();
         }
     }
@@ -69,11 +73,23 @@ public class MantleIngestionService {
     private void runIngestionPipeline() {
         try {
             long currentLiveBlock = web3j.ethBlockNumber().send().getBlockNumber().longValue();
-            long subscribeFromBlock = currentLiveBlock;
+            long subscribeFromBlock;
 
-            if (syncStartBlock > 0 && syncStartBlock < currentLiveBlock) {
-                log.info("Historical sync required. Target live block: {}. Starting from: {}", currentLiveBlock, syncStartBlock);
+            // 🌟 1. 优先从 PostgreSQL 读取上次断点
+            Long dbLastBlock = getCheckpointFromPG();
+
+            if (dbLastBlock != null) {
+                subscribeFromBlock = dbLastBlock + 1;
+                log.info("🚀 Resuming from PostgreSQL checkpoint. Starting block: {}", subscribeFromBlock);
+                if (subscribeFromBlock < currentLiveBlock) {
+                    subscribeFromBlock = performHistoricalSync(subscribeFromBlock, currentLiveBlock);
+                }
+            } else if (syncStartBlock > 0 && syncStartBlock < currentLiveBlock) {
+                log.info("⚠️ No PostgreSQL checkpoint found. Using static syncStartBlock: {}", syncStartBlock);
                 subscribeFromBlock = performHistoricalSync(syncStartBlock, currentLiveBlock);
+            } else {
+                log.info("🆕 No historical sync needed. Starting from live block: {}", currentLiveBlock);
+                subscribeFromBlock = currentLiveBlock;
             }
 
             if (isRunning.get()) {
@@ -85,10 +101,32 @@ public class MantleIngestionService {
         }
     }
 
-    /**
-     * Fetches historical logs in chunks to prevent public RPC nodes from rejecting large block ranges.
-     * Returns the next block number to start live subscription from.
-     */
+    private Long getCheckpointFromPG() {
+        try {
+            String sql = "SELECT last_processed_block FROM chain_sync_state WHERE chain_name = ?";
+            return jdbcTemplate.queryForObject(sql, Long.class, CHAIN_NAME);
+        } catch (EmptyResultDataAccessException e) {
+            return null; // 表里没有记录
+        } catch (Exception e) {
+            log.error("Failed to read checkpoint from PostgreSQL.", e);
+            return null;
+        }
+    }
+
+    private void saveCheckpointToPG(long blockNumber) {
+        try {
+            // PostgreSQL 独有的 UPSERT (Insert or Update) 语法
+            String sql = "INSERT INTO chain_sync_state (chain_name, last_processed_block, updated_at) " +
+                    "VALUES (?, ?, NOW()) " +
+                    "ON CONFLICT (chain_name) DO UPDATE " +
+                    "SET last_processed_block = EXCLUDED.last_processed_block, updated_at = NOW()";
+            jdbcTemplate.update(sql, CHAIN_NAME, blockNumber);
+            lastSavedBlock = blockNumber;
+        } catch (Exception e) {
+            log.error("Failed to save checkpoint {} to PostgreSQL.", blockNumber, e);
+        }
+    }
+
     private long performHistoricalSync(long startBlock, long targetBlock) {
         long currentStart = startBlock;
 
@@ -113,6 +151,8 @@ public class MantleIngestionService {
                     }
                 }
 
+                // 🌟 Chunk 同步完成后，将当前 Chunk 的结尾区块写入 PG
+                saveCheckpointToPG(currentEnd);
                 log.info("Successfully synced chunk {} to {}. Processed {} events.", currentStart, currentEnd, logs.size());
             } catch (Exception e) {
                 log.error("Failed to fetch historical chunk {} to {}. Retrying in 2 seconds...", currentStart, currentEnd, e);
@@ -121,7 +161,7 @@ public class MantleIngestionService {
                 } catch (InterruptedException ie) {
                     Thread.currentThread().interrupt();
                 }
-                continue; // Retry the same chunk
+                continue;
             }
 
             currentStart = currentEnd + 1;
@@ -139,11 +179,33 @@ public class MantleIngestionService {
         );
         filter.addOptionalTopics(V2_SWAP_TOPIC, V3_SWAP_TOPIC);
 
+        // 如果之前有旧的订阅，先清理掉
+        if (subscription != null && !subscription.isDisposed()) {
+            subscription.dispose();
+        }
+
         subscription = web3j.ethLogFlowable(filter).subscribe(
                 this::processLog,
                 error -> {
-                    log.error("Error occurred in live log subscription flow.", error);
-                    isRunning.set(false);
+                    log.error("❌ Live subscription flow broken (e.g. filter not found). Error: {}", error.getMessage());
+
+                    // 🌟 核心修复：发生错误时，不是退出程序，而是等待几秒后重新订阅
+                    if (isRunning.get()) {
+                        log.info("🔄 Attempting to reconnect live subscription...");
+                        try {
+                            Thread.sleep(3000); // 稍微等一下，避免节点被频繁重试打挂
+                        } catch (InterruptedException ie) {
+                            Thread.currentThread().interrupt();
+                        }
+
+                        // 从我们记录在内存中的最后一次保存的区块高度继续监听
+                        // 如果没有，就退回到传入的 startBlock
+                        long reconnectBlock = lastSavedBlock > 0 ? lastSavedBlock : startBlock;
+                        log.info("🔄 Reconnecting from block: {}", reconnectBlock);
+
+                        // 递归调用自己，创建一个全新的 Filter
+                        subscribeToLiveEvents(reconnectBlock);
+                    }
                 }
         );
     }
@@ -154,11 +216,12 @@ public class MantleIngestionService {
         }
 
         try {
+            long currentBlockNum = ethLog.getBlockNumber().longValue();
             Long blockTimestamp = resolveBlockTimestamp(ethLog.getBlockNumber());
 
             RawLog rawLog = RawLog.builder()
                     .chainName(CHAIN_NAME)
-                    .blockNumber(ethLog.getBlockNumber().longValue())
+                    .blockNumber(currentBlockNum)
                     .blockTimestamp(blockTimestamp)
                     .txHash(ethLog.getTransactionHash())
                     .logIndex(ethLog.getLogIndex().longValue())
@@ -171,7 +234,13 @@ public class MantleIngestionService {
                     .ingestionTimestamp(System.currentTimeMillis())
                     .build();
 
+            // 发送给 Kafka
             kafkaProducer.send(rawLog);
+
+            // 🌟 实时流模式下，只有当区块号发生变更时，才向 PG 写入一次（避免每个 Log 都写库）
+            if (currentBlockNum > lastSavedBlock) {
+                saveCheckpointToPG(currentBlockNum);
+            }
 
         } catch (Exception e) {
             log.error("Failed to process log entry for transaction {}", ethLog.getTransactionHash(), e);

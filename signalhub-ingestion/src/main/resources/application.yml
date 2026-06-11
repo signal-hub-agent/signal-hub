@@ -9,6 +9,11 @@ spring:
       retries: 3
       # Increase acks to all for data reliability
       acks: all
+  datasource:
+    url: jdbc:postgresql://localhost:5433/signal_hub?currentSchema=signal_hub
+    username: postgres
+    password: postgres
+    driver-class-name: org.postgresql.Driver
 
 web3j:
   client-address: https://rpc.mantle.xyz

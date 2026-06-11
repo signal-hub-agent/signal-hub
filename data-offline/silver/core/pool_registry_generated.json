@@ -1,0 +1,738 @@
+{
+    "0x509b9a0aa01a12245bc6b4874ddd16c470d353e2": {
+        "t0_address": "0x55b9f84605b30df9bb9d817a6900219f25218157",
+        "t0_sym": "BILL",
+        "t0_dec": 18,
+        "t1_address": "0x779ded0c9e1022225f8e0630b35a9b54be713736",
+        "t1_sym": "USDT0",
+        "t1_dec": 6
+    },
+    "0xb2810371d52e911f522314b760b7ff91d37d7ea3": {
+        "t0_address": "0x09bc4e0d864854c6afb6eb9a9cdf58ac190d0df9",
+        "t0_sym": "USDC",
+        "t0_dec": 6,
+        "t1_address": "0x78c1b0c915c4faa5fffa6cabf0219da63d7f4cb8",
+        "t1_sym": "WMNT",
+        "t1_dec": 18
+    },
+    "0xe706609c5fb4bf63a8f56b676a4dda3115fb79e9": {
+        "t0_address": "0x09bc4e0d864854c6afb6eb9a9cdf58ac190d0df9",
+        "t0_sym": "USDC",
+        "t0_dec": 6,
+        "t1_address": "0x78c1b0c915c4faa5fffa6cabf0219da63d7f4cb8",
+        "t1_sym": "WMNT",
+        "t1_dec": 18
+    },
+    "0x2cc6a607f3445d826b9e29f507b3a2e3b9dae106": {
+        "t0_address": "0x09bc4e0d864854c6afb6eb9a9cdf58ac190d0df9",
+        "t0_sym": "USDC",
+        "t0_dec": 6,
+        "t1_address": "0x5aa7649fdbda47de64a07ac81d64b682af9c0724",
+        "t1_sym": "wAAPLx",
+        "t1_dec": 18
+    },
+    "0x373c05fbe686fa1f3abf5e37ac74c4fac73d2e95": {
+        "t0_address": "0x779ded0c9e1022225f8e0630b35a9b54be713736",
+        "t0_sym": "USDT0",
+        "t0_dec": 6,
+        "t1_address": "0x78c1b0c915c4faa5fffa6cabf0219da63d7f4cb8",
+        "t1_sym": "WMNT",
+        "t1_dec": 18
+    },
+    "0xe4765c8071f45c558e79f3ec9d77ac9af0058569": {
+        "t0_address": "0x201eba5cc46d216ce6dc03f6a759e8e766e956ae",
+        "t0_sym": "USDT",
+        "t0_dec": 6,
+        "t1_address": "0x78c1b0c915c4faa5fffa6cabf0219da63d7f4cb8",
+        "t1_sym": "WMNT",
+        "t1_dec": 18
+    },
+    "0x9bb52162d59314a6f3d5ff1bad38ef595ec5814f": {
+        "t0_address": "0x111111d2bf19e43c34263401e0cad979ed1cdb61",
+        "t0_sym": "USD1",
+        "t0_dec": 18,
+        "t1_address": "0xdeaddeaddeaddeaddeaddeaddeaddeaddead1111",
+        "t1_sym": "WETH",
+        "t1_dec": 18
+    },
+    "0x87ea83f40fccdb5e4a10fcc66a7a73b3f12bbf35": {
+        "t0_address": "0x29cc30f9d113b356ce408667aa6433589cecbdca",
+        "t0_sym": "ELSA",
+        "t0_dec": 18,
+        "t1_address": "0x78c1b0c915c4faa5fffa6cabf0219da63d7f4cb8",
+        "t1_sym": "WMNT",
+        "t1_dec": 18
+    },
+    "0xf4f2a6f5a72e594e8c901222544f93492543aefc": {
+        "t0_address": "0x09bc4e0d864854c6afb6eb9a9cdf58ac190d0df9",
+        "t0_sym": "USDC",
+        "t0_dec": 6,
+        "t1_address": "0x201eba5cc46d216ce6dc03f6a759e8e766e956ae",
+        "t1_sym": "USDT",
+        "t1_dec": 6
+    },
+    "0x8fbad1a9ad1bafb6cc0bc7807ffa12115803e991": {
+        "t0_address": "0x201eba5cc46d216ce6dc03f6a759e8e766e956ae",
+        "t0_sym": "USDT",
+        "t0_dec": 6,
+        "t1_address": "0x78c1b0c915c4faa5fffa6cabf0219da63d7f4cb8",
+        "t1_sym": "WMNT",
+        "t1_dec": 18
+    },
+    "0xdf8254d083988d517ac6d457bdcf2af6ac50682c": {
+        "t0_address": "0x78c1b0c915c4faa5fffa6cabf0219da63d7f4cb8",
+        "t0_sym": "WMNT",
+        "t0_dec": 18,
+        "t1_address": "0xdeaddeaddeaddeaddeaddeaddeaddeaddead1111",
+        "t1_sym": "WETH",
+        "t1_dec": 18
+    },
+    "0x5d9e333a3c140f2d7c64c4f0045ed5345d453811": {
+        "t0_address": "0xcda86a272531e8640cd7f1a92c01839911b90bb0",
+        "t0_sym": "mETH",
+        "t0_dec": 18,
+        "t1_address": "0xe6829d9a7ee3040e1276fa75293bde931859e8fa",
+        "t1_sym": "cmETH",
+        "t1_dec": 18
+    },
+    "0xa7c728c4be834ddaf5c49ee4ced678d8aff49de6": {
+        "t0_address": "0x779ded0c9e1022225f8e0630b35a9b54be713736",
+        "t0_sym": "USDT0",
+        "t0_dec": 6,
+        "t1_address": "0xdeaddeaddeaddeaddeaddeaddeaddeaddead1111",
+        "t1_sym": "WETH",
+        "t1_dec": 18
+    },
+    "0x3e5922cd0cec71dc2d60ec8b36aa4c05b7c1672f": {
+        "t0_address": "0x201eba5cc46d216ce6dc03f6a759e8e766e956ae",
+        "t0_sym": "USDT",
+        "t0_dec": 6,
+        "t1_address": "0x78c1b0c915c4faa5fffa6cabf0219da63d7f4cb8",
+        "t1_sym": "WMNT",
+        "t1_dec": 18
+    },
+    "0x011d57bb869f6c7a9e69323c3f277720d2919be7": {
+        "t0_address": "0x201eba5cc46d216ce6dc03f6a759e8e766e956ae",
+        "t0_sym": "USDT",
+        "t0_dec": 6,
+        "t1_address": "0xdeaddeaddeaddeaddeaddeaddeaddeaddead1111",
+        "t1_sym": "WETH",
+        "t1_dec": 18
+    },
+    "0xcc0f771fef9e9248ff296d127fad7bf0c69e655f": {
+        "t0_address": "0x78c1b0c915c4faa5fffa6cabf0219da63d7f4cb8",
+        "t0_sym": "WMNT",
+        "t0_dec": 18,
+        "t1_address": "0xcda86a272531e8640cd7f1a92c01839911b90bb0",
+        "t1_sym": "mETH",
+        "t1_dec": 18
+    },
+    "0x84ec2a3907ed9e79c7a45551fef9da29d5f2ae9b": {
+        "t0_address": "0x09bc4e0d864854c6afb6eb9a9cdf58ac190d0df9",
+        "t0_sym": "USDC",
+        "t0_dec": 6,
+        "t1_address": "0x78c1b0c915c4faa5fffa6cabf0219da63d7f4cb8",
+        "t1_sym": "WMNT",
+        "t1_dec": 18
+    },
+    "0xf032b07539965c12b2e76b5cfbe13ccbda23e866": {
+        "t0_address": "0x78c1b0c915c4faa5fffa6cabf0219da63d7f4cb8",
+        "t0_sym": "WMNT",
+        "t0_dec": 18,
+        "t1_address": "0xe6829d9a7ee3040e1276fa75293bde931859e8fa",
+        "t1_sym": "cmETH",
+        "t1_dec": 18
+    },
+    "0x19a414a6b1743315c731492cb9b7b559d7db9ab7": {
+        "t0_address": "0x201eba5cc46d216ce6dc03f6a759e8e766e956ae",
+        "t0_sym": "USDT",
+        "t0_dec": 6,
+        "t1_address": "0xdeaddeaddeaddeaddeaddeaddeaddeaddead1111",
+        "t1_sym": "WETH",
+        "t1_dec": 18
+    },
+    "0x7fe1d1518729697c40f6558af8826589ae208fa9": {
+        "t0_address": "0x201eba5cc46d216ce6dc03f6a759e8e766e956ae",
+        "t0_sym": "USDT",
+        "t0_dec": 6,
+        "t1_address": "0x78c1b0c915c4faa5fffa6cabf0219da63d7f4cb8",
+        "t1_sym": "WMNT",
+        "t1_dec": 18
+    },
+    "0xe63ba626494f88d5a269b435213f2e8803cce318": {
+        "t0_address": "0x548c4116a97e0138f78000088ea3f155717b98ed",
+        "t0_sym": "KING",
+        "t0_dec": 18,
+        "t1_address": "0xcda86a272531e8640cd7f1a92c01839911b90bb0",
+        "t1_sym": "mETH",
+        "t1_dec": 18
+    },
+    "0xf449ad0367829534f68161efef8d1c3b9e26f782": {
+        "t0_address": "0x201eba5cc46d216ce6dc03f6a759e8e766e956ae",
+        "t0_sym": "USDT",
+        "t0_dec": 6,
+        "t1_address": "0x78c1b0c915c4faa5fffa6cabf0219da63d7f4cb8",
+        "t1_sym": "WMNT",
+        "t1_dec": 18
+    },
+    "0x43cf441f5949d52faa105060239543492193c87e": {
+        "t0_address": "0x09bc4e0d864854c6afb6eb9a9cdf58ac190d0df9",
+        "t0_sym": "USDC",
+        "t0_dec": 6,
+        "t1_address": "0xa90872aca656ebe47bdebf3b19ec9dd9c5adc7f8",
+        "t1_sym": "wCRCLx",
+        "t1_dec": 18
+    },
+    "0xc1f43e45f86e7bfb92c3c309b0ef366f9ba33bfa": {
+        "t0_address": "0x09bc4e0d864854c6afb6eb9a9cdf58ac190d0df9",
+        "t0_sym": "USDC",
+        "t0_dec": 6,
+        "t1_address": "0x5be26527e817998a7206475496fde1e68957c5a6",
+        "t1_sym": "USDY",
+        "t1_dec": 18
+    },
+    "0xd6ecefcd6f94073a7837af5c791e2180b6e66b90": {
+        "t0_address": "0x09bc4e0d864854c6afb6eb9a9cdf58ac190d0df9",
+        "t0_sym": "USDC",
+        "t0_dec": 6,
+        "t1_address": "0xdeaddeaddeaddeaddeaddeaddeaddeaddead1111",
+        "t1_sym": "WETH",
+        "t1_dec": 18
+    },
+    "0xf79c37b8344c58467ec88c01b82c2fd8fccdbbd0": {
+        "t0_address": "0x201eba5cc46d216ce6dc03f6a759e8e766e956ae",
+        "t0_sym": "USDT",
+        "t0_dec": 6,
+        "t1_address": "0xcda86a272531e8640cd7f1a92c01839911b90bb0",
+        "t1_sym": "mETH",
+        "t1_dec": 18
+    },
+    "0xdc16ff7d202bae83b35fd7cdbba28be6b8b13f24": {
+        "t0_address": "0x779ded0c9e1022225f8e0630b35a9b54be713736",
+        "t0_sym": "USDT0",
+        "t0_dec": 6,
+        "t1_address": "0xe5c330addf7aa9c7838da836436142c56a15aa95",
+        "t1_sym": "BSB",
+        "t1_dec": 18
+    },
+    "0x33b1d7cfff71bba9dd987f96ad57e0a5f7db9ac5": {
+        "t0_address": "0x09bc4e0d864854c6afb6eb9a9cdf58ac190d0df9",
+        "t0_sym": "USDC",
+        "t0_dec": 6,
+        "t1_address": "0xdeaddeaddeaddeaddeaddeaddeaddeaddead1111",
+        "t1_sym": "WETH",
+        "t1_dec": 18
+    },
+    "0x373f7a2b95f28f38500eb70652e12038cca3bab8": {
+        "t0_address": "0x09bc4e0d864854c6afb6eb9a9cdf58ac190d0df9",
+        "t0_sym": "USDC",
+        "t0_dec": 6,
+        "t1_address": "0xc88fcd8b874fdb3256e8b55b3decb8c24eab4c02",
+        "t1_sym": "wSPYx",
+        "t1_dec": 18
+    },
+    "0xf3eb01fcd4fa6006c27c504fce8790154d055caa": {
+        "t0_address": "0x78c1b0c915c4faa5fffa6cabf0219da63d7f4cb8",
+        "t0_sym": "WMNT",
+        "t0_dec": 18,
+        "t1_address": "0xdeaddeaddeaddeaddeaddeaddeaddeaddead1111",
+        "t1_sym": "WETH",
+        "t1_dec": 18
+    },
+    "0xbb27ccaa52d27ab055a7f9aaedb0f04372ea74aa": {
+        "t0_address": "0x09bc4e0d864854c6afb6eb9a9cdf58ac190d0df9",
+        "t0_sym": "USDC",
+        "t0_dec": 6,
+        "t1_address": "0x201eba5cc46d216ce6dc03f6a759e8e766e956ae",
+        "t1_sym": "USDT",
+        "t1_dec": 6
+    },
+    "0x1b03630817c64cf69fc4bcbc70bc3acba1d63ce3": {
+        "t0_address": "0x201eba5cc46d216ce6dc03f6a759e8e766e956ae",
+        "t0_sym": "USDT",
+        "t0_dec": 6,
+        "t1_address": "0xdeaddeaddeaddeaddeaddeaddeaddeaddead1111",
+        "t1_sym": "WETH",
+        "t1_dec": 18
+    },
+    "0x1a4d4aa3bd8587f6e05cc98cf87954f7d95c11c6": {
+        "t0_address": "0x09bc4e0d864854c6afb6eb9a9cdf58ac190d0df9",
+        "t0_sym": "USDC",
+        "t0_dec": 6,
+        "t1_address": "0x78c1b0c915c4faa5fffa6cabf0219da63d7f4cb8",
+        "t1_sym": "WMNT",
+        "t1_dec": 18
+    },
+    "0x9df1e55e6281b2c8c9211ce7fadcfbf49c7afd32": {
+        "t0_address": "0x09bc4e0d864854c6afb6eb9a9cdf58ac190d0df9",
+        "t0_sym": "USDC",
+        "t0_dec": 6,
+        "t1_address": "0xcda86a272531e8640cd7f1a92c01839911b90bb0",
+        "t1_sym": "mETH",
+        "t1_dec": 18
+    },
+    "0xe855dae59c7abfedb47d4ae3bb0faa0b1c52a2bc": {
+        "t0_address": "0x29cc30f9d113b356ce408667aa6433589cecbdca",
+        "t0_sym": "ELSA",
+        "t0_dec": 18,
+        "t1_address": "0x779ded0c9e1022225f8e0630b35a9b54be713736",
+        "t1_sym": "USDT0",
+        "t1_dec": 6
+    },
+    "0x505258001e834251634029742fc73b5cab4fd67d": {
+        "t0_address": "0x09bc4e0d864854c6afb6eb9a9cdf58ac190d0df9",
+        "t0_sym": "USDC",
+        "t0_dec": 6,
+        "t1_address": "0xdbd9232fee15351068fe02f0683146e16d9f2cea",
+        "t1_sym": "wQQQx",
+        "t1_dec": 18
+    },
+    "0x48ef5640e71001cac842f5627a0bfec1ef09deb7": {
+        "t0_address": "0xcda86a272531e8640cd7f1a92c01839911b90bb0",
+        "t0_sym": "mETH",
+        "t0_dec": 18,
+        "t1_address": "0xdeaddeaddeaddeaddeaddeaddeaddeaddead1111",
+        "t1_sym": "WETH",
+        "t1_dec": 18
+    },
+    "0xf99907291da3b352eb6b0930f7e2a3eaf0f41a31": {
+        "t0_address": "0x09bc4e0d864854c6afb6eb9a9cdf58ac190d0df9",
+        "t0_sym": "USDC",
+        "t0_dec": 6,
+        "t1_address": "0x78c1b0c915c4faa5fffa6cabf0219da63d7f4cb8",
+        "t1_sym": "WMNT",
+        "t1_dec": 18
+    },
+    "0x7c88dd67138291d38f0fea2889e4a341cd8983b1": {
+        "t0_address": "0x1bdd8878252daddd3af2ba30628813271294edc0",
+        "t0_sym": "CATI",
+        "t0_dec": 18,
+        "t1_address": "0x78c1b0c915c4faa5fffa6cabf0219da63d7f4cb8",
+        "t1_sym": "WMNT",
+        "t1_dec": 18
+    },
+    "0x8748e10925850891643f31beff1132e574260cd7": {
+        "t0_address": "0x09bc4e0d864854c6afb6eb9a9cdf58ac190d0df9",
+        "t0_sym": "USDC",
+        "t0_dec": 6,
+        "t1_address": "0x78c1b0c915c4faa5fffa6cabf0219da63d7f4cb8",
+        "t1_sym": "WMNT",
+        "t1_dec": 18
+    },
+    "0xace7a42c030759ea903e9c39ad26a0f9b4a11927": {
+        "t0_address": "0x26a6b0dcdcfb981362afa56d581e4a7dba3be140",
+        "t0_sym": "PUFF",
+        "t0_dec": 18,
+        "t1_address": "0x78c1b0c915c4faa5fffa6cabf0219da63d7f4cb8",
+        "t1_sym": "WMNT",
+        "t1_dec": 18
+    },
+    "0x0b15691c828ff6d499375e2ca2070b08dd62369e": {
+        "t0_address": "0x201eba5cc46d216ce6dc03f6a759e8e766e956ae",
+        "t0_sym": "USDT",
+        "t0_dec": 6,
+        "t1_address": "0x78c1b0c915c4faa5fffa6cabf0219da63d7f4cb8",
+        "t1_sym": "WMNT",
+        "t1_dec": 18
+    },
+    "0x086f766b336dfb0f705dc030db01993b22d81266": {
+        "t0_address": "0x09bc4e0d864854c6afb6eb9a9cdf58ac190d0df9",
+        "t0_sym": "USDC",
+        "t0_dec": 6,
+        "t1_address": "0x78c1b0c915c4faa5fffa6cabf0219da63d7f4cb8",
+        "t1_sym": "WMNT",
+        "t1_dec": 18
+    },
+    "0x699075c242a6e792587f4fa6153e97768761c234": {
+        "t0_address": "0x111111d2bf19e43c34263401e0cad979ed1cdb61",
+        "t0_sym": "USD1",
+        "t0_dec": 18,
+        "t1_address": "0x78c1b0c915c4faa5fffa6cabf0219da63d7f4cb8",
+        "t1_sym": "WMNT",
+        "t1_dec": 18
+    },
+    "0x5c819961990c9f4f9fbfd4101f1d4e565b8aa0a6": {
+        "t0_address": "0x201eba5cc46d216ce6dc03f6a759e8e766e956ae",
+        "t0_sym": "USDT",
+        "t0_dec": 6,
+        "t1_address": "0xcda86a272531e8640cd7f1a92c01839911b90bb0",
+        "t1_sym": "mETH",
+        "t1_dec": 18
+    },
+    "0xda9d18fd4bc094660d79721feb2e72c962ab54fe": {
+        "t0_address": "0x09bc4e0d864854c6afb6eb9a9cdf58ac190d0df9",
+        "t0_sym": "USDC",
+        "t0_dec": 6,
+        "t1_address": "0x78c1b0c915c4faa5fffa6cabf0219da63d7f4cb8",
+        "t1_sym": "WMNT",
+        "t1_dec": 18
+    },
+    "0x0e1f84a9e388071e20df101b36c14c817bf81953": {
+        "t0_address": "0x09bc4e0d864854c6afb6eb9a9cdf58ac190d0df9",
+        "t0_sym": "USDC",
+        "t0_dec": 6,
+        "t1_address": "0x266e5923f6118f8b340ca5a23ae7f71897361476",
+        "t1_sym": "wMSTRx",
+        "t1_dec": 18
+    },
+    "0x351f9beb9881316f25132bb389da91345d89fbff": {
+        "t0_address": "0x09bc4e0d864854c6afb6eb9a9cdf58ac190d0df9",
+        "t0_sym": "USDC",
+        "t0_dec": 6,
+        "t1_address": "0xdeaddeaddeaddeaddeaddeaddeaddeaddead1111",
+        "t1_sym": "WETH",
+        "t1_dec": 18
+    },
+    "0x785153bfe24f49e1ca09f5b5d55b9f7a7efbddf0": {
+        "t0_address": "0x09bc4e0d864854c6afb6eb9a9cdf58ac190d0df9",
+        "t0_sym": "USDC",
+        "t0_dec": 6,
+        "t1_address": "0x201eba5cc46d216ce6dc03f6a759e8e766e956ae",
+        "t1_sym": "USDT",
+        "t1_dec": 6
+    },
+    "0x90334606d1c9fee77f2f1b04f7c46048037ea893": {
+        "t0_address": "0x09bc4e0d864854c6afb6eb9a9cdf58ac190d0df9",
+        "t0_sym": "USDC",
+        "t0_dec": 6,
+        "t1_address": "0x201eba5cc46d216ce6dc03f6a759e8e766e956ae",
+        "t1_sym": "USDT",
+        "t1_dec": 6
+    },
+    "0xa875ac23d106394d1baaae5bc42b951268bc04e2": {
+        "t0_address": "0x09bc4e0d864854c6afb6eb9a9cdf58ac190d0df9",
+        "t0_sym": "USDC",
+        "t0_dec": 6,
+        "t1_address": "0x93e62845c1dd5822ebc807ab71a5fb750decd15a",
+        "t1_sym": "wNVDAx",
+        "t1_dec": 18
+    },
+    "0x29234f4aa0842c4b27bf3ebfec3e7a25c85cc133": {
+        "t0_address": "0x09bc4e0d864854c6afb6eb9a9cdf58ac190d0df9",
+        "t0_sym": "USDC",
+        "t0_dec": 6,
+        "t1_address": "0x78c1b0c915c4faa5fffa6cabf0219da63d7f4cb8",
+        "t1_sym": "WMNT",
+        "t1_dec": 18
+    },
+    "0x562a1a3979a4a10ac2e060cfa4b53cad8011604a": {
+        "t0_address": "0x201eba5cc46d216ce6dc03f6a759e8e766e956ae",
+        "t0_sym": "USDT",
+        "t0_dec": 6,
+        "t1_address": "0x25356aeca4210ef7553140edb9b8026089e49396",
+        "t1_sym": "LEND",
+        "t1_dec": 18
+    },
+    "0x5e7935d70b5d14b6cf36fbde59944533fab96b3c": {
+        "t0_address": "0x09bc4e0d864854c6afb6eb9a9cdf58ac190d0df9",
+        "t0_sym": "USDC",
+        "t0_dec": 6,
+        "t1_address": "0x43680abf18cf54898be84c6ef78237cfbd441883",
+        "t1_sym": "wTSLAx",
+        "t1_dec": 18
+    },
+    "0xff53524d0e01a00ecec997d2ebb5f06860068709": {
+        "t0_address": "0x201eba5cc46d216ce6dc03f6a759e8e766e956ae",
+        "t0_sym": "USDT",
+        "t0_dec": 6,
+        "t1_address": "0x58538e6a46e07434d7e7375bc268d3cb839c0133",
+        "t1_sym": "ENA",
+        "t1_dec": 18
+    },
+    "0xbd51f73d81cff395172a40a4de4af7b6cc5da05b": {
+        "t0_address": "0x78c1b0c915c4faa5fffa6cabf0219da63d7f4cb8",
+        "t0_sym": "WMNT",
+        "t0_dec": 18,
+        "t1_address": "0x8731d54e9d02c286767d56ac03e8037c07e01e98",
+        "t1_sym": "STG",
+        "t1_dec": 18
+    },
+    "0x4e7685df06201521f35a182467feefe02c53d847": {
+        "t0_address": "0x201eba5cc46d216ce6dc03f6a759e8e766e956ae",
+        "t0_sym": "USDT",
+        "t0_dec": 6,
+        "t1_address": "0x78c1b0c915c4faa5fffa6cabf0219da63d7f4cb8",
+        "t1_sym": "WMNT",
+        "t1_dec": 18
+    },
+    "0x4247f6c7409832adc101d7df714f96fecb327c92": {
+        "t0_address": "0x201eba5cc46d216ce6dc03f6a759e8e766e956ae",
+        "t0_sym": "USDT",
+        "t0_dec": 6,
+        "t1_address": "0x78c1b0c915c4faa5fffa6cabf0219da63d7f4cb8",
+        "t1_sym": "WMNT",
+        "t1_dec": 18
+    },
+    "0xb670d2b452d0ecc468cccfd532482d45dddde2a1": {
+        "t0_address": "0x371c7ec6d8039ff7933a2aa28eb827ffe1f52f07",
+        "t0_sym": "JOE",
+        "t0_dec": 18,
+        "t1_address": "0x4515a45337f461a11ff0fe8abf3c606ae5dc00c9",
+        "t1_sym": "MOE",
+        "t1_dec": 18
+    },
+    "0x66960ed892daf022c5f282c5316c38cb6f0c1333": {
+        "t0_address": "0x09bc4e0d864854c6afb6eb9a9cdf58ac190d0df9",
+        "t0_sym": "USDC",
+        "t0_dec": 6,
+        "t1_address": "0x1630f08370917e79df0b7572395a5e907508bbbc",
+        "t1_sym": "wGOOGLx",
+        "t1_dec": 18
+    },
+    "0x30ac02b4c99d140cde2a212ca807cbda35d4f6b5": {
+        "t0_address": "0x25356aeca4210ef7553140edb9b8026089e49396",
+        "t0_sym": "LEND",
+        "t0_dec": 18,
+        "t1_address": "0x78c1b0c915c4faa5fffa6cabf0219da63d7f4cb8",
+        "t1_sym": "WMNT",
+        "t1_dec": 18
+    },
+    "0x763868612858358f62b05691db82ad35a9b3e110": {
+        "t0_address": "0x4515a45337f461a11ff0fe8abf3c606ae5dc00c9",
+        "t0_sym": "MOE",
+        "t0_dec": 18,
+        "t1_address": "0x78c1b0c915c4faa5fffa6cabf0219da63d7f4cb8",
+        "t1_sym": "WMNT",
+        "t1_dec": 18
+    },
+    "0xd114e1fdf9e4129b863a6af53806ae0f8c54ce88": {
+        "t0_address": "0x78c1b0c915c4faa5fffa6cabf0219da63d7f4cb8",
+        "t0_sym": "WMNT",
+        "t0_dec": 18,
+        "t1_address": "0xcda86a272531e8640cd7f1a92c01839911b90bb0",
+        "t1_sym": "mETH",
+        "t1_dec": 18
+    },
+    "0x56e64941feb207f5b55ff7446b397303d9b6a26c": {
+        "t0_address": "0x45db70e1c808dae42f9c4dfea74ba5e6a113bdc1",
+        "t0_sym": "OPG",
+        "t0_dec": 18,
+        "t1_address": "0x779ded0c9e1022225f8e0630b35a9b54be713736",
+        "t1_sym": "USDT0",
+        "t1_dec": 6
+    },
+    "0x2305ad92740d186bf3834d4cca2eee1b3d5fa3fe": {
+        "t0_address": "0x779ded0c9e1022225f8e0630b35a9b54be713736",
+        "t0_sym": "USDT0",
+        "t0_dec": 6,
+        "t1_address": "0xd81a4adea9932a6bdba0bdbc8c5fd4c78e5a09f1",
+        "t1_sym": "VOOI",
+        "t1_dec": 18
+    },
+    "0x94c400b9eb9d371299143d7b1af1202f0f956d73": {
+        "t0_address": "0x78c1b0c915c4faa5fffa6cabf0219da63d7f4cb8",
+        "t0_sym": "WMNT",
+        "t0_dec": 18,
+        "t1_address": "0xdeaddeaddeaddeaddeaddeaddeaddeaddead1111",
+        "t1_sym": "WETH",
+        "t1_dec": 18
+    },
+    "0x5d637c5c1ddda97fc6115fa68ca66e444c0f2686": {
+        "t0_address": "0x78c1b0c915c4faa5fffa6cabf0219da63d7f4cb8",
+        "t0_sym": "WMNT",
+        "t0_dec": 18,
+        "t1_address": "0xcda86a272531e8640cd7f1a92c01839911b90bb0",
+        "t1_sym": "mETH",
+        "t1_dec": 18
+    },
+    "0x67f1e667ac60786b714b3d68a5ac35cc90441b73": {
+        "t0_address": "0x78c1b0c915c4faa5fffa6cabf0219da63d7f4cb8",
+        "t0_sym": "WMNT",
+        "t0_dec": 18,
+        "t1_address": "0xdeaddeaddeaddeaddeaddeaddeaddeaddead1111",
+        "t1_sym": "WETH",
+        "t1_dec": 18
+    },
+    "0x43925fffade90c48fbd12384d5f4d4da9c359fc4": {
+        "t0_address": "0x09bc4e0d864854c6afb6eb9a9cdf58ac190d0df9",
+        "t0_sym": "USDC",
+        "t0_dec": 6,
+        "t1_address": "0x78c1b0c915c4faa5fffa6cabf0219da63d7f4cb8",
+        "t1_sym": "WMNT",
+        "t1_dec": 18
+    },
+    "0xc64639501bcee4c48ef05a46f7bedf00b3529a99": {
+        "t0_address": "0x78c1b0c915c4faa5fffa6cabf0219da63d7f4cb8",
+        "t0_sym": "WMNT",
+        "t0_dec": 18,
+        "t1_address": "0xdeaddeaddeaddeaddeaddeaddeaddeaddead1111",
+        "t1_sym": "WETH",
+        "t1_dec": 18
+    },
+    "0x776d50283cd843f5e383ad6d5729db5ef4867848": {
+        "t0_address": "0x78c1b0c915c4faa5fffa6cabf0219da63d7f4cb8",
+        "t0_sym": "WMNT",
+        "t0_dec": 18,
+        "t1_address": "0x8731d54e9d02c286767d56ac03e8037c07e01e98",
+        "t1_sym": "STG",
+        "t1_dec": 18
+    },
+    "0xb1c4ffee7c4a2bc3de2da7ff22e6dc409defda14": {
+        "t0_address": "0x201eba5cc46d216ce6dc03f6a759e8e766e956ae",
+        "t0_sym": "USDT",
+        "t0_dec": 6,
+        "t1_address": "0x78c1b0c915c4faa5fffa6cabf0219da63d7f4cb8",
+        "t1_sym": "WMNT",
+        "t1_dec": 18
+    },
+    "0xfa608f52956694ee43d493a9cc5bf84272cd2720": {
+        "t0_address": "0x09bc4e0d864854c6afb6eb9a9cdf58ac190d0df9",
+        "t0_sym": "USDC",
+        "t0_dec": 6,
+        "t1_address": "0x78c1b0c915c4faa5fffa6cabf0219da63d7f4cb8",
+        "t1_sym": "WMNT",
+        "t1_dec": 18
+    },
+    "0x5c4de5fd6aa5d6802f302a9f6df275cbfc6d8220": {
+        "t0_address": "0x09bc4e0d864854c6afb6eb9a9cdf58ac190d0df9",
+        "t0_sym": "USDC",
+        "t0_dec": 6,
+        "t1_address": "0x78c1b0c915c4faa5fffa6cabf0219da63d7f4cb8",
+        "t1_sym": "WMNT",
+        "t1_dec": 18
+    },
+    "0x4e23bb828e51cbc03c81d76c844228cc75f6a287": {
+        "t0_address": "0x09bc4e0d864854c6afb6eb9a9cdf58ac190d0df9",
+        "t0_sym": "USDC",
+        "t0_dec": 6,
+        "t1_address": "0x953707d7a1cb30cc5c636bda8eaebe410341eb14",
+        "t1_sym": "wHOODx",
+        "t1_dec": 18
+    },
+    "0x782bd3895a6ac561d0df11b02dd6f9e023f3a497": {
+        "t0_address": "0x09bc4e0d864854c6afb6eb9a9cdf58ac190d0df9",
+        "t0_sym": "USDC",
+        "t0_dec": 6,
+        "t1_address": "0x4e41a262caa93c6575d336e0a4eb79f3c67caa06",
+        "t1_sym": "wMETAx",
+        "t1_dec": 18
+    },
+    "0xa4657555cbddc069ed3389ac03330020692b13c4": {
+        "t0_address": "0x09bc4e0d864854c6afb6eb9a9cdf58ac190d0df9",
+        "t0_sym": "USDC",
+        "t0_dec": 6,
+        "t1_address": "0x201eba5cc46d216ce6dc03f6a759e8e766e956ae",
+        "t1_sym": "USDT",
+        "t1_dec": 6
+    },
+    "0xaf50cd8c03096a416fc1b88e328bab3e09e0f175": {
+        "t0_address": "0x09bc4e0d864854c6afb6eb9a9cdf58ac190d0df9",
+        "t0_sym": "USDC",
+        "t0_dec": 6,
+        "t1_address": "0xcda86a272531e8640cd7f1a92c01839911b90bb0",
+        "t1_sym": "mETH",
+        "t1_dec": 18
+    },
+    "0x560d064493de5a23e72ed916caf92ec6e8924948": {
+        "t0_address": "0x111111d2bf19e43c34263401e0cad979ed1cdb61",
+        "t0_sym": "USD1",
+        "t0_dec": 18,
+        "t1_address": "0x779ded0c9e1022225f8e0630b35a9b54be713736",
+        "t1_sym": "USDT0",
+        "t1_dec": 6
+    },
+    "0x8442048774eee4ebf19cec3c07154ec338978180": {
+        "t0_address": "0x779ded0c9e1022225f8e0630b35a9b54be713736",
+        "t0_sym": "USDT0",
+        "t0_dec": 6,
+        "t1_address": "0x8ddb986b11c039a6cc1dbcabd62bae911b348f33",
+        "t1_sym": "SCOR",
+        "t1_dec": 18
+    },
+    "0x076eb72e74c16b208c692eeab3750978d76b8f28": {
+        "t0_address": "0x201eba5cc46d216ce6dc03f6a759e8e766e956ae",
+        "t0_sym": "USDT",
+        "t0_dec": 6,
+        "t1_address": "0xdeaddeaddeaddeaddeaddeaddeaddeaddead1111",
+        "t1_sym": "WETH",
+        "t1_dec": 18
+    },
+    "0x585ec64f06afa80e474bb6574ef7be38a8ef94a7": {
+        "t0_address": "0x78c1b0c915c4faa5fffa6cabf0219da63d7f4cb8",
+        "t0_sym": "WMNT",
+        "t0_dec": 18,
+        "t1_address": "0xdeaddeaddeaddeaddeaddeaddeaddeaddead1111",
+        "t1_sym": "WETH",
+        "t1_dec": 18
+    },
+    "0xefc38c1b0d60725b824ebee8d431abfbf12bc953": {
+        "t0_address": "0x371c7ec6d8039ff7933a2aa28eb827ffe1f52f07",
+        "t0_sym": "JOE",
+        "t0_dec": 18,
+        "t1_address": "0x78c1b0c915c4faa5fffa6cabf0219da63d7f4cb8",
+        "t1_sym": "WMNT",
+        "t1_dec": 18
+    },
+    "0x545c3e7c17891b5ad450cb3a2c3f78d310bbc243": {
+        "t0_address": "0x201eba5cc46d216ce6dc03f6a759e8e766e956ae",
+        "t0_sym": "USDT",
+        "t0_dec": 6,
+        "t1_address": "0xdeaddeaddeaddeaddeaddeaddeaddeaddead1111",
+        "t1_sym": "WETH",
+        "t1_dec": 18
+    },
+    "0x32c1882baf179f6059d101aad3feac15b2b90da3": {
+        "t0_address": "0x58538e6a46e07434d7e7375bc268d3cb839c0133",
+        "t0_sym": "ENA",
+        "t0_dec": 18,
+        "t1_address": "0x78c1b0c915c4faa5fffa6cabf0219da63d7f4cb8",
+        "t1_sym": "WMNT",
+        "t1_dec": 18
+    },
+    "0xca455f94225a447c677ef0bf3a0c05626c090cd1": {
+        "t0_address": "0x09bc4e0d864854c6afb6eb9a9cdf58ac190d0df9",
+        "t0_sym": "USDC",
+        "t0_dec": 6,
+        "t1_address": "0x78c1b0c915c4faa5fffa6cabf0219da63d7f4cb8",
+        "t1_sym": "WMNT",
+        "t1_dec": 18
+    },
+    "0xf9cda48949ae1823eecdd314deecd8599ceaf7cc": {
+        "t0_address": "0x09bc4e0d864854c6afb6eb9a9cdf58ac190d0df9",
+        "t0_sym": "USDC",
+        "t0_dec": 6,
+        "t1_address": "0x78c1b0c915c4faa5fffa6cabf0219da63d7f4cb8",
+        "t1_sym": "WMNT",
+        "t1_dec": 18
+    },
+    "0xb301c86b37801ee31448fe09ef271279f6f0b068": {
+        "t0_address": "0x09bc4e0d864854c6afb6eb9a9cdf58ac190d0df9",
+        "t0_sym": "USDC",
+        "t0_dec": 6,
+        "t1_address": "0xdeaddeaddeaddeaddeaddeaddeaddeaddead1111",
+        "t1_sym": "WETH",
+        "t1_dec": 18
+    },
+    "0xc088da135983e11bbc3ca5936b5ff3299dad57ef": {
+        "t0_address": "0x60d01ec2d5e98ac51c8b4cf84dfcce98d527c747",
+        "t0_sym": "iZi",
+        "t0_dec": 18,
+        "t1_address": "0x78c1b0c915c4faa5fffa6cabf0219da63d7f4cb8",
+        "t1_sym": "WMNT",
+        "t1_dec": 18
+    },
+    "0x14bdf0998a2313f8e5772866fdac029f3d58eb2b": {
+        "t0_address": "0x09bc4e0d864854c6afb6eb9a9cdf58ac190d0df9",
+        "t0_sym": "USDC",
+        "t0_dec": 6,
+        "t1_address": "0x78c1b0c915c4faa5fffa6cabf0219da63d7f4cb8",
+        "t1_sym": "WMNT",
+        "t1_dec": 18
+    },
+    "0xa97d73a9e9df96492e9e64f406a82de1541649b9": {
+        "t0_address": "0x201eba5cc46d216ce6dc03f6a759e8e766e956ae",
+        "t0_sym": "USDT",
+        "t0_dec": 6,
+        "t1_address": "0x78c1b0c915c4faa5fffa6cabf0219da63d7f4cb8",
+        "t1_sym": "WMNT",
+        "t1_dec": 18
+    },
+    "0xea32a56c9195484bed638cddc9d0cec6c4f00de1": {
+        "t0_address": "0x201eba5cc46d216ce6dc03f6a759e8e766e956ae",
+        "t0_sym": "USDT",
+        "t0_dec": 6,
+        "t1_address": "0x78c1b0c915c4faa5fffa6cabf0219da63d7f4cb8",
+        "t1_sym": "WMNT",
+        "t1_dec": 18
+    }
+}

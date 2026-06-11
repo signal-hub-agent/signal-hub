@@ -1,22 +1,27 @@
 """
-离线调度任务：每日地址财务指标计算
-从 clean_swaps 提取数据，进行量化计算后，写入 gold_address_financials_daily
-对应原 detective_service.py 中的重度计算逻辑
+Offline Batch Job: Daily Address Financial Metrics Calculation
+Extracts data from clean_swaps, performs quantitative calculations,
+and writes to gold_address_financials_daily.
 """
+import os
+import sys
 import logging
 from datetime import datetime
-import clickhouse_connect
 
+# 🌟 动态将 data-offline 目录加入系统路径
+current_dir = os.path.dirname(os.path.abspath(__file__))
+parent_dir = os.path.dirname(os.path.dirname(current_dir))
+sys.path.append(parent_dir)
+
+# 🌟 使用项目中统一的数据库连接配置
+from config.database import get_clickhouse_client
+
+logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
 logger = logging.getLogger(__name__)
 
-def get_ch_client():
-    # TODO: 生产环境应替换为 config 读取
-    return clickhouse_connect.get_client(host='localhost', port=8123, username='default', password='123456')
-
-# ================= 原样迁移的业务规则 (保持不动) =================
+# ================= Business Logic (Unchanged) =================
 
 def _calc_style_tags(trades: int, active_days: int, volume: float, win_rate: float) -> list:
-    """Generates human-readable style tags based on trading behavior."""
     tags = []
     avg = trades / max(active_days, 1)
     if avg >= 10: tags.append("High-Frequency")
@@ -62,42 +67,41 @@ def _calc_risk(win_rate: float, max_drawdown: float, trade_count: int) -> tuple:
     else: risk_level = "RED"
     return risk_level, risk_score, flags
 
-# ================= 原样迁移的 Silver 层计算逻辑 (保持不动) =================
+# ================= Calculation from Silver Layer =================
 
 def _get_swap_count(client, addr: str) -> int:
-    """Returns the number of swaps for an address in the last 30 days."""
     query = """
         SELECT count() FROM signal_hub.clean_swaps
-        WHERE lower(trader_address) = {addr:String} AND toDateTime(block_timestamp/1000) >= now() - INTERVAL 30 DAY
+        WHERE lower(trader_address) = %(addr)s AND toDateTime(block_timestamp/1000) >= now() - INTERVAL 30 DAY
     """
-    row = client.query(query, parameters={"addr": addr}).first_row
-    return int(row[0] or 0)
+    rows = client.execute(query, {'addr': addr})
+    return int(rows[0][0]) if rows else 0
 
 def _calc_from_clean_swaps(client, addr: str, swap_count: int) -> dict:
-    """Real-time PnL calculation directly from signal_hub.clean_swaps."""
     query_basic = """
         SELECT COUNT(DISTINCT toDate(toDateTime(block_timestamp/1000))) AS active_days,
                SUM(amount_usd) AS total_volume, MAX(toDateTime(block_timestamp/1000)) AS last_active
         FROM signal_hub.clean_swaps
-        WHERE lower(trader_address) = {addr:String} AND toDateTime(block_timestamp/1000) >= now() - INTERVAL 30 DAY
+        WHERE lower(trader_address) = %(addr)s AND toDateTime(block_timestamp/1000) >= now() - INTERVAL 30 DAY
     """
-    row = client.query(query_basic, parameters={"addr": addr}).first_row
+    basic_rows = client.execute(query_basic, {'addr': addr})
+    row = basic_rows[0] if basic_rows else (0, 0, None)
     active_days  = int(row[0] or 0)
     total_volume = float(row[1] or 0)
 
     query_sell = """
         SELECT token_out_symbol, SUM(amount_usd) AS sell_usd FROM signal_hub.clean_swaps
-        WHERE lower(trader_address) = {addr:String} AND toDateTime(block_timestamp/1000) >= now() - INTERVAL 30 DAY
+        WHERE lower(trader_address) = %(addr)s AND toDateTime(block_timestamp/1000) >= now() - INTERVAL 30 DAY
           AND token_out_symbol NOT IN ('USDT','USDC','DAI','USDE') GROUP BY token_out_symbol
     """
-    sell_rows = client.query(query_sell, parameters={"addr": addr}).result_rows
+    sell_rows = client.execute(query_sell, {'addr': addr})
 
     query_buy = """
         SELECT token_in_symbol, SUM(amount_usd) AS buy_usd FROM signal_hub.clean_swaps
-        WHERE lower(trader_address) = {addr:String} AND toDateTime(block_timestamp/1000) >= now() - INTERVAL 30 DAY
+        WHERE lower(trader_address) = %(addr)s AND toDateTime(block_timestamp/1000) >= now() - INTERVAL 30 DAY
           AND token_in_symbol NOT IN ('USDT','USDC','DAI','USDE') GROUP BY token_in_symbol
     """
-    buy_rows = client.query(query_buy, parameters={"addr": addr}).result_rows
+    buy_rows = client.execute(query_buy, {'addr': addr})
 
     sell_map = {r[0]: float(r[1]) for r in sell_rows}
     buy_map  = {r[0]: float(r[1]) for r in buy_rows}
@@ -130,26 +134,26 @@ def _calc_from_clean_swaps(client, addr: str, swap_count: int) -> dict:
         "risk_level": risk_level, "risk_score": risk_score, "risk_flags": risk_flags
     }
 
-# ================= 新增：落库写入逻辑 =================
-def compute_and_save_address(address: str):
-    """单独计算某个地址并写入 Gold 表 (可被 API 兜底时按需调用或批量调用)"""
-    client = get_ch_client()
+# ================= Persistence to Gold Layer =================
+
+def compute_and_save_address(client, address: str):
     addr = address.lower()
     swap_count = _get_swap_count(client, addr)
     if swap_count == 0:
-        logger.info(f"No swaps found for {addr}, skipping.")
+        logger.debug("No swaps found for %s, skipping.", addr)
         return
 
     metrics = _calc_from_clean_swaps(client, addr, swap_count)
 
-    # 写入完善后的 Gold 表 (此处假定表结构已更新)
     insert_query = """
-        INSERT INTO signal_hub.gold_address_financials_daily 
-        (trader_address, calc_date, total_trades_30d, win_rate, profit_loss_ratio, sharpe_ratio, 
-         max_drawdown, total_volume_usd, active_days_30d, account_growth_30d, style_tags, 
-         risk_level, risk_score, risk_flags, composite_score)
-        VALUES
+        INSERT INTO signal_hub.gold_address_financials_daily (
+            trader_address, calc_date, total_trades_30d, win_rate, 
+            profit_loss_ratio, sharpe_ratio, max_drawdown, total_volume_usd, 
+            active_days_30d, account_growth_30d, style_tags, risk_level, 
+            risk_score, risk_flags, composite_score
+        ) VALUES
     """
+
     row = (
         addr, datetime.utcnow().date(), metrics["total_trades_30d"], metrics["win_rate"],
         metrics["profit_loss_ratio"], metrics["sharpe_ratio"], metrics["max_drawdown"],
@@ -157,9 +161,38 @@ def compute_and_save_address(address: str):
         metrics["tags"], metrics["risk_level"], metrics["risk_score"], metrics["risk_flags"],
         metrics["composite_score"]
     )
-    client.insert(insert_query, [row])
-    logger.info(f"Successfully computed and saved gold metrics for {addr}")
+
+    try:
+        # clickhouse-driver 插入数据的方式
+        client.execute(insert_query, [row])
+        logger.info("Successfully computed and saved gold metrics for %s", addr)
+    except Exception as e:
+        logger.error("Failed to insert metrics for %s. Error: %s", addr, str(e))
+
+def run_daily_batch():
+    """
+    Main job: Find active addresses from the last 24 hours and calculate metrics.
+    """
+    client = get_clickhouse_client()
+    logger.info("Starting batch processing for daily address financials...")
+
+    # Fetch distinct active addresses (Limit to 50 for initial testing)
+    query = """
+        SELECT DISTINCT lower(trader_address) 
+        FROM signal_hub.clean_swaps 
+        WHERE toDateTime(block_timestamp/1000) >= now() - INTERVAL 1 DAY
+        LIMIT 50
+    """
+    rows = client.execute(query)
+    addresses = [row[0] for row in rows]
+
+    logger.info("Found %d active addresses to process.", len(addresses))
+
+    for i, addr in enumerate(addresses):
+        logger.info("Processing address %d/%d: %s", i + 1, len(addresses), addr)
+        compute_and_save_address(client, addr)
+
+    logger.info("Daily batch processing completed successfully.")
 
 if __name__ == "__main__":
-    # 调度脚本入口：批量查 clean_swaps 里的所有去重地址并计算
-    pass
+    run_daily_batch()

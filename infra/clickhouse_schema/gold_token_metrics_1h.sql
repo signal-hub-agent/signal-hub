@@ -36,4 +36,4 @@ CREATE TABLE IF NOT EXISTS signal_hub.gold_token_metrics_1h (
 
     updated_at DateTime DEFAULT now() COMMENT 'Row modification time for ReplacingMergeTree'
 ) ENGINE = ReplacingMergeTree(updated_at)
-ORDER BY (token_address, calc_time);
+ORDER BY (token_address, token_symbol, calc_time);

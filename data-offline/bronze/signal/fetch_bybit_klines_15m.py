@@ -7,7 +7,8 @@ import logging
 from datetime import datetime
 
 current_dir = os.path.dirname(os.path.abspath(__file__))
-parent_dir = os.path.dirname(current_dir)
+# 位于 bronze/signal/ 下，退两层到 data-offline
+parent_dir = os.path.dirname(os.path.dirname(current_dir))
 sys.path.append(parent_dir)
 
 from config.database import get_clickhouse_client
@@ -16,15 +17,41 @@ logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(
 logger = logging.getLogger(__name__)
 
 BYBIT_API_URL = "https://api.bybit.com/v5/market/kline"
-SUPPORTED_TOKENS = {"MNT": "MNTUSDT", "ETH": "ETHUSDT", "BTC": "BTCUSDT", "SOL": "SOLUSDT"}
-INTERVALS = {"1h": "60", "4h": "240", "1d": "D"}
+
+# ==============================================================================
+# Token Mapping: 链上 Symbol -> Bybit 交易对 Symbol
+# 已自动过滤掉 Bybit 不存在的合成股票(wTSLAx等)和未上所的土狗币
+# ==============================================================================
+SUPPORTED_TOKENS = {
+    # 核心大盘与基础币
+    "BTC": "BTCUSDT",
+    "ETH": "ETHUSDT",
+    "MNT": "MNTUSDT",
+    "SOL": "SOLUSDT",
+
+    # Top 30 映射转换
+    "WMNT": "MNTUSDT",
+    "WETH": "ETHUSDT",
+    "WBTC": "BTCUSDT",
+    "FBTC": "BTCUSDT",      # 映射到基础资产
+    "USDe": "USDEUSDT",
+    "USDC": "USDCUSDT",
+
+    # Mantle 生态热门币 / 已上所
+    "mETH": "METHUSDT",
+    "COOK": "COOKUSDT",
+    "PUFF": "PUFFUSDT",
+    "CATI": "CATIUSDT"
+}
+
+INTERVALS = {"15m": "15", "1h": "60", "4h": "240", "1d": "D"}
 
 def fetch_kline_from_bybit(symbol: str, interval: str, limit: int = 200, max_retries: int = 3) -> list:
     """
     Abstracted method to fetch Kline data from Bybit API with retry logic.
     """
     params = {
-        "category": "linear",
+        "category": "spot",
         "symbol": symbol,
         "interval": interval,
         "limit": limit
@@ -56,16 +83,17 @@ def fetch_and_store_raw_klines(limit: int = 200):
     records = []
     fetch_ts = datetime.utcnow()
 
-    for token, symbol in SUPPORTED_TOKENS.items():
+    for db_symbol, api_symbol in SUPPORTED_TOKENS.items():
         for interval_name, interval_code in INTERVALS.items():
 
-            kline_list = fetch_kline_from_bybit(symbol, interval_code, limit)
+            kline_list = fetch_kline_from_bybit(api_symbol, interval_code, limit)
 
             if kline_list:
                 raw_json_str = json.dumps(kline_list)
-                records.append((token, interval_name, raw_json_str, fetch_ts))
+                # 存入 ClickHouse 的是链上的名字 (db_symbol)，这样才能和 clean_swaps 里的名字对齐
+                records.append((db_symbol, interval_name, raw_json_str, fetch_ts))
             else:
-                logger.error("Skipping insertion for %s (%s) due to consecutive API failures.", token, interval_name)
+                logger.error("Skipping insertion for %s (%s) due to consecutive API failures.", db_symbol, interval_name)
 
     if records:
         try:

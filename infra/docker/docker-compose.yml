@@ -94,8 +94,27 @@ services:
     networks:
       - signal_hub_net
 
+    # ==========================================
+    # PostgreSQL (元数据与关系型业务库)
+    # ==========================================
+  postgres:
+    image: postgres:15-alpine
+    container_name: signal_hub_postgres
+    ports:
+      - "5433:5432"
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_DB: signal_hub
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+      - ./pg.sql:/docker-entrypoint-initdb.d/init.sql
+    networks:
+      - signal_hub_net
+
 volumes:
   clickhouse_native_data:
+  postgres_data:
 
 networks:
   signal_hub_net:

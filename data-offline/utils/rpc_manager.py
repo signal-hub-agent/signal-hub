@@ -57,7 +57,7 @@ def get_w3_with_retry(sleep_minutes: int = 5) -> Web3:
 def batch_fetch_pools(pool_addresses: set) -> dict:
     """
     Accumulates a batch of unknown pool addresses and queries them using a single
-    healthy Web3 connection session to avoid TCP handshake overhead and rate limits.
+    healthy Web3 connection session. Includes rate-limiting to prevent RPC bans.
     """
     if not pool_addresses:
         return {}
@@ -67,8 +67,10 @@ def batch_fetch_pools(pool_addresses: set) -> dict:
         logger.error("Cannot perform batch fetch. No healthy RPC available.")
         return {}
 
-    logger.info("Starting batch fetch for %d unknown pools...", len(pool_addresses))
+    total_pools = len(pool_addresses)
+    logger.info("Starting batch fetch for %d unknown pools with rate limiting...", total_pools)
     results = {}
+    processed_count = 0
 
     for pool_address in pool_addresses:
         try:
@@ -80,16 +82,24 @@ def batch_fetch_pools(pool_addresses: set) -> dict:
             t1_contract = w3.eth.contract(address=token1_addr, abi=ERC20_ABI)
 
             try: t0_sym = t0_contract.functions.symbol().call()
-            except: t0_sym = "UNKNOWN"
+            except Exception as inner_e:
+                logger.debug("Failed to get token0 symbol for pool %s: %s", pool_address, inner_e)
+                t0_sym = "UNKNOWN"
 
             try: t0_dec = t0_contract.functions.decimals().call()
-            except: t0_dec = 18
+            except Exception as inner_e:
+                logger.debug("Failed to get token0 decimals for pool %s: %s", pool_address, inner_e)
+                t0_dec = 18
 
             try: t1_sym = t1_contract.functions.symbol().call()
-            except: t1_sym = "UNKNOWN"
+            except Exception as inner_e:
+                logger.debug("Failed to get token1 symbol for pool %s: %s", pool_address, inner_e)
+                t1_sym = "UNKNOWN"
 
             try: t1_dec = t1_contract.functions.decimals().call()
-            except: t1_dec = 18
+            except Exception as inner_e:
+                logger.debug("Failed to get token1 decimals for pool %s: %s", pool_address, inner_e)
+                t1_dec = 18
 
             results[str(pool_address).lower()] = {
                 "t0_address": token0_addr.lower(),
@@ -99,9 +109,18 @@ def batch_fetch_pools(pool_addresses: set) -> dict:
                 "t1_sym": t1_sym,
                 "t1_dec": t1_dec
             }
+            processed_count += 1
+
+            # Progress logging every 20 pools
+            if processed_count % 20 == 0:
+                logger.info("Progress: Fetched %d/%d pools...", processed_count, total_pools)
+
         except Exception as e:
-            logger.debug("Failed to fetch metadata for pool %s: %s", pool_address, str(e))
+            logger.warning("Failed to fetch metadata for pool %s: %s", pool_address, str(e))
             continue
 
-    logger.info("Batch fetch completed. Successfully resolved %d/%d pools.", len(results), len(pool_addresses))
+        # RATE LIMITING: Pause for 200ms between each pool to avoid triggering RPC DDoS protection
+        time.sleep(0.2)
+
+    logger.info("Batch fetch completed. Successfully resolved %d/%d pools.", len(results), total_pools)
     return results
