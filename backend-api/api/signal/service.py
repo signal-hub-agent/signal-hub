@@ -9,7 +9,7 @@ from fastapi import HTTPException
 
 from core.db_clickhouse import get_ch_client
 from core.redis_client import get_redis_client
-from integrations.deepseek_client import generate_token_signal_report
+from llm_engine.deepseek_client import generate_token_signal_report
 from .schemas import TokenSignalResponse, ComponentScores
 
 logger = logging.getLogger(__name__)
@@ -60,11 +60,7 @@ class SignalService:
         # ---------------------------------------------------------
         query_gold = """
             SELECT
-                volume_24h_usd, volume_ratio, tx_count_24h, volume_score,
-                mev_toxicity_pct, mev_score,
-                contract_score,
-                current_price, ma_trend_type, rsi_zone, macd_position, tech_score,
-                composite_score, signal_color
+                *
             FROM signal_hub.gold_token_metrics_1h
             WHERE upper(token_symbol) = {token:String}
             ORDER BY calc_time DESC LIMIT 1
@@ -85,11 +81,20 @@ class SignalService:
         components = ComponentScores(
             volume_trend={
                 "label": "Volume Trend", "score": int(row.get('volume_score', 0)), "max_score": 15,
-                "details": {"volume_24h_usd": row.get('volume_24h_usd'), "ratio": row.get('volume_ratio')}
+                "details": {
+                    "volume_24h_usd": row.get('volume_24h_usd'),
+                    "volume_7d_avg_usd": row.get('volume_7d_avg_usd'),
+                    "ratio": row.get('volume_ratio'),
+                    "tx_count_24h": row.get('tx_count_24h')
+                }
             },
             mev_toxicity={
                 "label": "MEV Toxicity", "score": int(row.get('mev_score', 0)), "max_score": 25,
-                "details": {"toxicity_pct": row.get('mev_toxicity_pct')}
+                "details": {
+                    "toxicity_pct": row.get('mev_toxicity_pct'),
+                    "mev_suspicious_txs": row.get('mev_suspicious_txs'),
+                    "mev_total_txs": row.get('mev_total_txs')
+                }
             },
             contract_safety={
                 "label": "Contract Safety", "score": int(row.get('contract_score', 28)), "max_score": 30,
@@ -97,7 +102,18 @@ class SignalService:
             },
             technical_bias={
                 "label": "Technical Bias", "score": int(row.get('tech_score', 0)), "max_score": 30,
-                "details": {"ma_trend": row.get('ma_trend_type'), "rsi": row.get('rsi_zone'), "macd": row.get('macd_position')}
+                "details": {
+                    "ma_trend": row.get('ma_trend_type'),
+                    "ma_alignment": row.get('ma_alignment'),
+                    "rsi_zone": row.get('rsi_zone'),
+                    "rsi_value": float(row.get('rsi_value', 50.0)),
+                    "macd_position": row.get('macd_position'),
+                    "macd_histogram_trend": row.get('macd_histogram_trend'),
+                    "macd_divergence": row.get('macd_divergence'),
+                    "bollinger_pattern": row.get('bollinger_pattern'),
+                    "bollinger_support": float(row.get('bollinger_support', 0.0)),
+                    "bollinger_resistance": float(row.get('bollinger_resistance', 0.0))
+                }
             }
         )
 

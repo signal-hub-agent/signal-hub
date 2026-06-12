@@ -15,7 +15,7 @@ class Settings(BaseSettings):
 
     # PostgreSQL Configuration
     PG_HOST: str = os.getenv("PG_HOST", "localhost")
-    PG_PORT: int = int(os.getenv("PG_PORT", 5432))
+    PG_PORT: int = int(os.getenv("PG_PORT", 5433))
     PG_USER: str = os.getenv("PG_USER", "postgres")
     PG_PASSWORD: str = os.getenv("PG_PASSWORD", "postgres")
     PG_DATABASE: str = os.getenv("PG_DATABASE", "signal_hub")

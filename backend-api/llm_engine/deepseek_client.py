@@ -19,7 +19,7 @@ DEEPSEEK_API_URL = "https://api.deepseek.com/v1/chat/completions"
 DEEPSEEK_MODEL   = "deepseek-chat"
 
 def get_api_key() -> str:
-    key = os.environ.get("DEEPSEEK_API_KEY", "")
+    key = os.environ.get("DEEPSEEK_API_KEY", "sk-5862bc49ea6342d59fd0560890a96fdf")
     if not key:
         raise RuntimeError("DEEPSEEK_API_KEY environment variable not set")
     return key

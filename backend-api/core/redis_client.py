@@ -1,35 +1,37 @@
 import logging
 import redis.asyncio as redis
-from core.config import settings
+from core.config import settings # 假设你有配置文件，如果没有可以直接把 url 写死
 
 logger = logging.getLogger(__name__)
 
-class RedisManager:
-    def __init__(self):
-        self.client = None
+# 全局 Redis 连接池对象
+_redis_client = None
 
-    async def connect(self):
-        try:
-            self.client = redis.from_url(
-                settings.REDIS_URL,
-                encoding="utf-8",
-                decode_responses=True
-            )
-            # Ping to verify connection
-            await self.client.ping()
-            logger.info("Redis async connection established successfully.")
-        except Exception as e:
-            logger.error("Failed to connect to Redis: %s", str(e))
-            raise
+async def init_redis():
+    """初始化 Redis 连接池"""
+    global _redis_client
+    try:
+        # 这里替换成你真实的 Redis 地址，如果没设密码就用 "redis://localhost:6379"
+        redis_url = getattr(settings, "REDIS_URL", "redis://localhost:6379")
+        _redis_client = redis.from_url(redis_url, decode_responses=True)
+        # 测试一下连接是否畅通
+        await _redis_client.ping()
+        logger.info("✅ Redis client successfully initialized.")
+    except Exception as e:
+        logger.error(f"❌ Failed to initialize Redis: {e}")
 
-    async def disconnect(self):
-        if self.client:
-            await self.client.close()
-            logger.info("Redis connection closed.")
+async def close_redis():
+    """关闭 Redis 连接池"""
+    global _redis_client
+    if _redis_client:
+        await _redis_client.aclose() # 注意：高版本 redis.asyncio 使用 aclose()
+        logger.info("Redis client closed.")
 
-    def get_redis_client(self) -> redis.Redis:
-        if not self.client:
-            logger.warning("Redis client accessed before initialization.")
-        return self.client
+async def get_redis_client() -> redis.Redis:
+    """获取 Redis 客户端，带有防呆机制"""
+    global _redis_client
+    if _redis_client is None:
+        logger.warning("Redis client accessed before initialization. Initializing now...")
+        await init_redis()
 
-redis_manager = RedisManager()
+    return _redis_client

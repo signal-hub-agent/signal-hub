@@ -4,8 +4,8 @@ from datetime import datetime
 from typing import List, Optional
 
 from core.db_clickhouse import get_ch_client
-from core.redis_client import get_redis_client # 假设已在 core 中实现
-from llm_engine.deepseek_client import generate_address_profile # 按需调用的独立 LLM 服务
+from core.redis_client import get_redis_client
+from llm_engine.deepseek_client import generate_address_profile
 
 from .schemas import (
     AddressDetailResponse,

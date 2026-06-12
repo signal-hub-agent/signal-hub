@@ -80,3 +80,12 @@ CREATE TABLE IF NOT EXISTS chain_sync_state (
     last_processed_block BIGINT NOT NULL,
     updated_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP
 );
+
+ALTER TABLE signal_hub.users ADD COLUMN IF NOT EXISTS email VARCHAR(255);
+CREATE UNIQUE INDEX IF NOT EXISTS idx_users_email ON signal_hub.users(email);
+
+
+ALTER TABLE signal_hub.user_subscriptions ADD COLUMN IF NOT EXISTS email VARCHAR(255);
+ALTER TABLE signal_hub.user_subscriptions DROP CONSTRAINT IF EXISTS user_subscriptions_wallet_address_target_id_target_type_key;
+ALTER TABLE signal_hub.user_subscriptions ADD CONSTRAINT uniq_email_target_type UNIQUE (email, target_id, target_type);
+

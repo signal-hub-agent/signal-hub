@@ -4,31 +4,48 @@ SignalHub API - 唯一核心入口
 """
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
+from contextlib import asynccontextmanager
 from core.config import settings
-
+import logging
+from core.redis_client import init_redis, close_redis
+from core.db_postgres import pg_manager
+logger = logging.getLogger(__name__)
+from api.alerts import router as alerts_router
 # 导入领域驱动下的各模块路由
 from api.detective.router import router as detective_router
 from api.signal.router import router as signal_router
 # from api.dashboard.router import router as dashboard_router # 如果首页聚合也抽成了独立模块
 
-app = FastAPI(
-    title=settings.PROJECT_NAME,
-    version=settings.VERSION,
-    description="AI-driven Web3 Copy-trade Signal Platform for the Mantle Ecosystem.",
-)
+logger = logging.getLogger(__name__)
+
+@asynccontextmanager
+async def lifespan(app: FastAPI):
+    # ================= 启动阶段 (Startup) =================
+    logger.info("Starting up FastAPI application...")
+    await init_redis()
+    await pg_manager.connect()
+
+    yield  # yield 之前是启动执行的，之后是关闭执行的
+
+    # ================= 关闭阶段 (Shutdown) =================
+    logger.info("Shutting down FastAPI application...")
+    await close_redis()
+    await pg_manager.disconnect()
+
+app = FastAPI(lifespan=lifespan)
 
 # CORS 配置
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"],
+    allow_origins=["http://localhost:3000"],
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
 )
-
 # 挂载路由 (Routers)
 app.include_router(detective_router)
 app.include_router(signal_router)
+app.include_router(alerts_router.router, prefix="/api/v1/alerts", tags=["Alerts"])
 # app.include_router(dashboard_router)
 
 @app.get("/health", tags=["System"])

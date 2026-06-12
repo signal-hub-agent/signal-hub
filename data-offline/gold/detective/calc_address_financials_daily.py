@@ -181,7 +181,6 @@ def run_daily_batch():
         SELECT DISTINCT lower(trader_address) 
         FROM signal_hub.clean_swaps 
         WHERE toDateTime(block_timestamp/1000) >= now() - INTERVAL 1 DAY
-        LIMIT 50
     """
     rows = client.execute(query)
     addresses = [row[0] for row in rows]

@@ -10,3 +10,5 @@ redis
 # Configurations & External Calls
 pydantic-settings
 requests
+
+web3
