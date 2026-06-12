@@ -91,3 +91,6 @@ ALTER TABLE signal_hub.user_subscriptions ADD CONSTRAINT uniq_email_target_type 
 
 ALTER TABLE signal_hub.user_subscriptions ADD COLUMN IF NOT EXISTS name VARCHAR(100) DEFAULT 'My Address Alert';
 ALTER TABLE signal_hub.user_subscriptions ADD COLUMN IF NOT EXISTS config JSONB DEFAULT '{}'::jsonb;
+
+ALTER TABLE signal_hub.users ADD COLUMN IF NOT EXISTS telegram_chat_id VARCHAR(50);
+CREATE UNIQUE INDEX IF NOT EXISTS idx_users_telegram_chat_id ON signal_hub.users(telegram_chat_id);

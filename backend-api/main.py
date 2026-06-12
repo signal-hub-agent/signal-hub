@@ -16,8 +16,12 @@ from api.detective.router import router as detective_router
 from api.signal.router import router as signal_router
 # from api.dashboard.router import router as dashboard_router # 如果首页聚合也抽成了独立模块
 
-logger = logging.getLogger(__name__)
+from api.bot.router import router as bot_router
+import asyncio
+from workers.alert_router import AlertRouterWorker
 
+logger = logging.getLogger(__name__)
+alert_worker = AlertRouterWorker()
 @asynccontextmanager
 async def lifespan(app: FastAPI):
     # ================= 启动阶段 (Startup) =================
@@ -25,10 +29,13 @@ async def lifespan(app: FastAPI):
     await init_redis()
     await pg_manager.connect()
 
-    yield  # yield 之前是启动执行的，之后是关闭执行的
+    router_task = asyncio.create_task(alert_worker.start())
+    yield
 
     # ================= 关闭阶段 (Shutdown) =================
     logger.info("Shutting down FastAPI application...")
+    await alert_worker.stop()
+    router_task.cancel()
     await close_redis()
     await pg_manager.disconnect()
 
@@ -46,6 +53,7 @@ app.add_middleware(
 app.include_router(detective_router)
 app.include_router(signal_router)
 app.include_router(alerts_router.router, prefix="/api/v1/alerts", tags=["Alerts"])
+app.include_router(bot_router, prefix="/api/v1/bot", tags=["Telegram Bot"])
 # app.include_router(dashboard_router)
 
 @app.get("/health", tags=["System"])

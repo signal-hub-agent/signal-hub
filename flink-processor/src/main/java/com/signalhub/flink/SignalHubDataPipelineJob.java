@@ -2,9 +2,12 @@ package com.signalhub.flink;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.signalhub.flink.entity.RawLog;
+import com.signalhub.flink.function.AlertEventParserFunction;
 import com.signalhub.flink.sink.ClickHouseSinkFactory;
 import org.apache.flink.api.common.eventtime.WatermarkStrategy;
 import org.apache.flink.api.common.serialization.SimpleStringSchema;
+import org.apache.flink.connector.kafka.sink.KafkaRecordSerializationSchema;
+import org.apache.flink.connector.kafka.sink.KafkaSink;
 import org.apache.flink.connector.kafka.source.KafkaSource;
 import org.apache.flink.connector.kafka.source.enumerator.initializer.OffsetsInitializer;
 import org.apache.flink.streaming.api.datastream.DataStream;
@@ -75,6 +78,26 @@ public class SignalHubDataPipelineJob {
         rawLogStream.addSink(ClickHouseSinkFactory.createRawLogSink(chUrl, "default", ""))
                 .name("ClickHouse ODS Sink")
                 .uid("clickhouse-sink");
+        // 1. 调用刚才写的转换算子，得到实时告警 JSON 字符串流
+        DataStream<String> alertJsonStream = rawLogStream
+                .flatMap(new AlertEventParserFunction())
+                .name("Parse and Compute Alerts")
+                .uid("parse-compute-alerts");
+
+        // 2. 将结果写回 Kafka 的 `signal-hub-alerts` Topic 供下游 Python 服务消费
+        KafkaSink<String> kafkaAlertSink = KafkaSink.<String>builder()
+                .setBootstrapServers(brokers) // 复用上面的 brokers 变量
+                .setRecordSerializer(KafkaRecordSerializationSchema.builder()
+                        .setTopic("signal-hub-alerts")
+                        .setValueSerializationSchema(new SimpleStringSchema())
+                        .build()
+                )
+                .setDeliveryGuarantee(org.apache.flink.connector.base.DeliveryGuarantee.AT_LEAST_ONCE)
+                .build();
+
+        alertJsonStream.sinkTo(kafkaAlertSink)
+                .name("Kafka Alert Sink")
+                .uid("kafka-alert-sink");
 
         LOG.info("Executing SignalHub Flink pipeline.");
         env.execute("SignalHub RawLog Ingestion Job");

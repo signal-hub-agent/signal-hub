@@ -21,10 +21,24 @@
 
     <dependencies>
         <dependency>
+            <groupId>com.ververica</groupId>
+            <artifactId>flink-connector-postgres-cdc</artifactId>
+            <version>3.0.0</version> </dependency>
+        <dependency>
+            <groupId>org.apache.flink</groupId>
+            <artifactId>flink-connector-kafka</artifactId>
+            <version>1.17.1</version>
+        </dependency>
+        <dependency>
             <groupId>org.apache.flink</groupId>
             <artifactId>flink-streaming-java</artifactId>
             <version>1.17.1</version>
             <scope>provided</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.flink</groupId>
+            <artifactId>flink-shaded-guava</artifactId>
+            <version>30.1.1-jre-16.1</version>
         </dependency>
         <dependency>
             <groupId>org.apache.flink</groupId>

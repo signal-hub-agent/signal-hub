@@ -36,7 +36,11 @@ public class MantleIngestionService {
     private static final String CHAIN_NAME = "mantle";
     private static final String V2_SWAP_TOPIC = "0xd78ad95fa46c994b6551d0da85fc275fe613ce37657fb8d5e3d130840159d822";
     private static final String V3_SWAP_TOPIC = "0xc42079f94a6350d7e6235f29174924f928cc2ac818eb64fed8004e115fbcca67";
-
+    // 新增：流动性池 Mint (加池子) 和 Burn (撤池子) 的标准 Topic
+    private static final String V2_MINT_TOPIC = "0x4c209b5fc8ad50758f13e2e1088ba56a560dff690a1c6fef26394f4c03821c4f";
+    private static final String V2_BURN_TOPIC = "0xdccd412f0b1252819cb1fd330b93224ca42612892bb3f4f789976e6d81936496";
+    // 新增：跨链桥的标准 Deposit/Withdraw Topic (需根据 Mantle 官方桥 ABI 确认，此处用标准 ERC20 占位)
+    private static final String BRIDGE_DEPOSIT_TOPIC = "0xdc2e0b575a7c2fb2bc7c01bbf8a59b581be34d5ea4da62dc1030e5ea4e410a56";
     private static final int BLOCK_TIMESTAMP_CACHE_SIZE = 1000;
     private static final long BLOCK_CHUNK_SIZE = 2000L;
 
@@ -139,8 +143,7 @@ public class MantleIngestionService {
                     DefaultBlockParameter.valueOf(BigInteger.valueOf(currentEnd)),
                     (List<String>) null
             );
-            filter.addOptionalTopics(V2_SWAP_TOPIC, V3_SWAP_TOPIC);
-
+            filter.addOptionalTopics(V2_SWAP_TOPIC, V3_SWAP_TOPIC, V2_MINT_TOPIC, V2_BURN_TOPIC, BRIDGE_DEPOSIT_TOPIC);
             try {
                 EthLog ethLogResponse = web3j.ethGetLogs(filter).send();
                 List<EthLog.LogResult> logs = ethLogResponse.getLogs();

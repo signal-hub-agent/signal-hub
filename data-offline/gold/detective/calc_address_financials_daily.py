@@ -5,6 +5,7 @@ and writes to gold_address_financials_daily.
 """
 import os
 import sys
+import json
 import logging
 from datetime import datetime
 
@@ -172,11 +173,12 @@ def compute_and_save_address(client, address: str):
 def run_daily_batch():
     """
     Main job: Find active addresses from the last 24 hours and calculate metrics.
+    Generates smart_money_addresses.json for Flink real-time context.
     """
     client = get_clickhouse_client()
     logger.info("Starting batch processing for daily address financials...")
 
-    # Fetch distinct active addresses (Limit to 50 for initial testing)
+    # 1. Fetch distinct active addresses (Limit removed for prod)
     query = """
         SELECT DISTINCT lower(trader_address) 
         FROM signal_hub.clean_swaps 
@@ -190,6 +192,29 @@ def run_daily_batch():
     for i, addr in enumerate(addresses):
         logger.info("Processing address %d/%d: %s", i + 1, len(addresses), addr)
         compute_and_save_address(client, addr)
+
+    # ==========================================
+    # 🌟 新增逻辑：提取聪明钱地址并输出为 JSON
+    # ==========================================
+    logger.info("Exporting Smart Money addresses for Flink context...")
+    export_query = """
+        SELECT DISTINCT lower(trader_address)
+        FROM signal_hub.gold_address_financials_daily
+        WHERE composite_score >= 80
+          AND calc_date = today()
+    """
+    try:
+        smart_rows = client.execute(export_query)
+        smart_addresses = [row[0] for row in smart_rows]
+
+        # 将文件输出到 Flink 容器能够挂载/读取的公共目录，这里放在项目根目录下
+        output_path = os.path.join(parent_dir, "smart_money_addresses.json")
+        with open(output_path, "w") as f:
+            json.dump(smart_addresses, f, indent=4)
+
+        logger.info("Successfully exported %d smart money addresses to %s", len(smart_addresses), output_path)
+    except Exception as e:
+        logger.error("Failed to export smart money addresses. Error: %s", str(e))
 
     logger.info("Daily batch processing completed successfully.")
 
