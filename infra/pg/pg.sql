@@ -89,3 +89,5 @@ ALTER TABLE signal_hub.user_subscriptions ADD COLUMN IF NOT EXISTS email VARCHAR
 ALTER TABLE signal_hub.user_subscriptions DROP CONSTRAINT IF EXISTS user_subscriptions_wallet_address_target_id_target_type_key;
 ALTER TABLE signal_hub.user_subscriptions ADD CONSTRAINT uniq_email_target_type UNIQUE (email, target_id, target_type);
 
+ALTER TABLE signal_hub.user_subscriptions ADD COLUMN IF NOT EXISTS name VARCHAR(100) DEFAULT 'My Address Alert';
+ALTER TABLE signal_hub.user_subscriptions ADD COLUMN IF NOT EXISTS config JSONB DEFAULT '{}'::jsonb;
