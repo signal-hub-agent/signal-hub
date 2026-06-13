@@ -24,10 +24,10 @@ class Settings(BaseSettings):
     REDIS_URL: str = os.getenv("REDIS_URL", "redis://localhost:6379/0")
 
     # LLM Engine Configuration
-    LLM_API_KEY: str = os.getenv("LLM_API_KEY", "llm_api_key_here")
-    LLM_MODEL: str = os.getenv("LLM_MODEL", "gpt-4o")
-
-    TG_BOT_TOKEN: str = "8914578519:AAEdzAnYi3J5BdtjqSZ72Ac-6sduMibVvnU"
+    LLM_API_KEY: str = os.getenv("LLM_API_KEY", "")
+    LLM_MODEL: str = os.getenv("LLM_MODEL", "")
+    LLM_API_URL: str = os.getenv("LLM_API_URL", "")
+    TG_BOT_TOKEN: str = os.getenv("TG_BOT_TOKEN","")
 
     # 🌟 Web3 / RPC High Availability Pool
     # Pydantic will parse a JSON-like string or a valid list directly

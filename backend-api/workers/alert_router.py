@@ -76,6 +76,55 @@ class AlertRouterWorker:
             logger.warning(f"Invalid signal format received: {signal}")
             return
 
+        # ==============================================================
+        # 🌟 核心修改 1：全局大屏 KPI 实时累加 (与个人订阅彻底解耦)
+        # 只要 Flink 判定为异动并推送到 Kafka，无论是否有人订阅，都计入大屏总盘
+        # ==============================================================
+        try:
+            from datetime import datetime
+            from core.redis_client import get_redis_client
+            redis_client = await get_redis_client()
+            today_str = datetime.utcnow().strftime('%Y%m%d')
+
+            usd_value = float(event_data.get("usd_value", 0.0))
+
+            # 用于批量设置过期的 key 列表
+            expire_keys = []
+
+            if event_type == "SMART_SWAP":
+                await redis_client.incr(f"kpi:smart_swaps:count:{today_str}")
+                if usd_value > 0: await redis_client.incrbyfloat(f"kpi:smart_swaps:sum:{today_str}", usd_value)
+                expire_keys.extend([f"kpi:smart_swaps:count:{today_str}", f"kpi:smart_swaps:sum:{today_str}"])
+
+            elif event_type == "ZERO_DAY":
+                await redis_client.incr(f"kpi:zero_day:count:{today_str}")
+                expire_keys.append(f"kpi:zero_day:count:{today_str}")
+
+            elif event_type == "WHALE_MOVEMENT":
+                await redis_client.incr(f"kpi:whale_moves:count:{today_str}")
+                if usd_value > 0: await redis_client.incrbyfloat(f"kpi:whale_moves:sum:{today_str}", usd_value)
+                expire_keys.extend([f"kpi:whale_moves:count:{today_str}", f"kpi:whale_moves:sum:{today_str}"])
+
+            elif event_type == "LIQUIDITY":
+                await redis_client.incr(f"kpi:liquidity:count:{today_str}")
+                if usd_value > 0: await redis_client.incrbyfloat(f"kpi:liquidity:sum:{today_str}", usd_value)
+                expire_keys.extend([f"kpi:liquidity:count:{today_str}", f"kpi:liquidity:sum:{today_str}"])
+
+            elif event_type == "BRIDGE":
+                await redis_client.incr(f"kpi:bridges:count:{today_str}")
+                if usd_value > 0: await redis_client.incrbyfloat(f"kpi:bridges:sum:{today_str}", usd_value)
+                expire_keys.extend([f"kpi:bridges:count:{today_str}", f"kpi:bridges:sum:{today_str}"])
+
+            # 统一设置 48 小时过期
+            for k in set(expire_keys):
+                await redis_client.expire(k, 172800)
+
+        except Exception as e:
+            logger.error(f"Failed to update global dashboard KPIs in Redis: {e}")
+
+        # ==============================================================
+        # 核心修改 2：原有逻辑，处理个人订阅分发与 Telegram 推送
+        # ==============================================================
         # 1. 联合查询：只查订阅了该地址，并且已经绑定了 Telegram 的用户
         query = """
             SELECT s.email, s.config, u.telegram_chat_id 
@@ -89,14 +138,13 @@ class AlertRouterWorker:
             logger.error(f"Database query failed in process_signal: {e}")
             return
 
-        # 如果没有人订阅该地址（或者订阅者没绑 TG），直接丢弃
+        # 如果没有人订阅该地址，不再往下走（但大屏指标已经在上方累加过了！）
         if not subscribers:
             return
 
         # 2. 遍历所有订阅者，进行规则引擎匹配
         for sub in subscribers:
             config_str = sub['config']
-            # asyncpg 返回的 JSONB 可能是字符串，也可能是 dict，做一层安全解析
             try:
                 config = json.loads(config_str) if isinstance(config_str, str) else config_str
             except Exception:
@@ -107,7 +155,6 @@ class AlertRouterWorker:
             alert_message = ""
 
             # =========== 规则引擎逻辑 ===========
-
             if event_type == "WHALE_MOVEMENT":
                 rule = config.get("whale_movement", {})
                 if rule.get("enabled", False):
@@ -189,21 +236,8 @@ class AlertRouterWorker:
                             f"*(Threshold setting: ${threshold:,.2f})*"
                         )
 
-            # =========== 触发发送与埋点 ===========
+            # =========== 触发 TG 消息发送 ===========
             if is_triggered and alert_message:
                 logger.info(f"Triggering TG alert to {chat_id} for event {event_type}")
-                # 1. 异步发送 TG 消息
+                # 仅发送消息，Redis 统计已经在函数开头完成了，原有的底部的 Redis try/except 块被删掉
                 asyncio.create_task(send_tg_message(chat_id, alert_message))
-
-                # 2. 🌟 新增：大屏今日告警数统计 (Redis 埋点)
-                try:
-                    from datetime import datetime
-                    from core.redis_client import get_redis_client
-                    redis_client = await get_redis_client()
-                    today_str = datetime.utcnow().strftime('%Y%m%d')
-                    kpi_key = f"dashboard:alerts_today:{today_str}"
-                    # 计数器 +1，并设置 48 小时自动过期（防止内存泄漏）
-                    await redis_client.incr(kpi_key)
-                    await redis_client.expire(kpi_key, 172800)
-                except Exception as e:
-                    logger.error(f"Failed to increment dashboard alert KPI: {e}")

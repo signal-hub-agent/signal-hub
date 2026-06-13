@@ -44,9 +44,15 @@ async def _async_ch_query(query: str) -> dict:
 # 数据契约 (Schemas)
 # ==========================================
 class KpiResponse(BaseModel):
-    volume_24h_usd: float
-    active_smart_money_count: int
-    alerts_today: int
+    smart_swaps_count: int
+    smart_swaps_sum: float
+    zero_day_count: int
+    whale_moves_count: int
+    whale_moves_sum: float
+    liquidity_count: int
+    liquidity_sum: float
+    bridges_count: int
+    bridges_sum: float
 
 class TokenRadarItem(BaseModel):
     symbol: str
@@ -64,36 +70,31 @@ class SmartMoneyItem(BaseModel):
 # ==========================================
 # 接口 1：顶部 KPI 看板
 # ==========================================
-@router.get("/kpis", response_model=KpiResponse, summary="获取大屏顶部全局 KPI")
+@router.get("/kpis", response_model=KpiResponse)
 async def get_dashboard_kpis():
-    # 1. 查 24H 监控资金总量
-    vol_query = """
-        SELECT sum(amount_usd) as total_vol 
-        FROM signal_hub.clean_swaps 
-        WHERE toDateTime(block_timestamp/1000) >= now() - INTERVAL 1 DAY
-    """
-    vol_data = await _async_ch_query(vol_query)
-    total_vol = vol_data["data"][0]["total_vol"] if vol_data["data"] else 0.0
-
-    # 2. 查今日活跃的高分聪明钱数量
-    sm_query = """
-        SELECT count(DISTINCT trader_address) as sm_count 
-        FROM signal_hub.gold_address_financials_daily 
-        WHERE calc_date = today() AND composite_score >= 80
-    """
-    sm_data = await _async_ch_query(sm_query)
-    sm_count = sm_data["data"][0]["sm_count"] if sm_data["data"] else 0
-
-    # 3. 查今日告警数 (从 Redis)
     redis_client = await get_redis_client()
     today_str = datetime.utcnow().strftime('%Y%m%d')
-    alerts_count = await redis_client.get(f"dashboard:alerts_today:{today_str}")
-    alerts_count = int(alerts_count) if alerts_count else 0
 
+    keys = [
+        f"kpi:smart_swaps:count:{today_str}", f"kpi:smart_swaps:sum:{today_str}",
+        f"kpi:zero_day:count:{today_str}",
+        f"kpi:whale_moves:count:{today_str}", f"kpi:whale_moves:sum:{today_str}",
+        f"kpi:liquidity:count:{today_str}", f"kpi:liquidity:sum:{today_str}",
+        f"kpi:bridges:count:{today_str}", f"kpi:bridges:sum:{today_str}"
+    ]
+    vals = await redis_client.mget(keys)
+
+    # 解析并返回 (防空指针处理)
     return KpiResponse(
-        volume_24h_usd=float(total_vol or 0),
-        active_smart_money_count=int(sm_count or 0),
-        alerts_today=alerts_count
+        smart_swaps_count=int(vals[0] or 0),
+        smart_swaps_sum=float(vals[1] or 0.0),
+        zero_day_count=int(vals[2] or 0),
+        whale_moves_count=int(vals[3] or 0),
+        whale_moves_sum=float(vals[4] or 0.0),
+        liquidity_count=int(vals[5] or 0),
+        liquidity_sum=float(vals[6] or 0.0),
+        bridges_count=int(vals[7] or 0),
+        bridges_sum=float(vals[8] or 0.0)
     )
 
 # ==========================================

@@ -9,17 +9,18 @@ import logging
 import requests
 from datetime import datetime
 from typing import Optional
+from core.config import settings
 
 # 复用后端已实现的全局数据库连接
 from core.db_clickhouse import get_ch_client
 
 logger = logging.getLogger(__name__)
 
-DEEPSEEK_API_URL = "https://api.deepseek.com/v1/chat/completions"
-DEEPSEEK_MODEL   = "deepseek-chat"
+DEEPSEEK_API_URL = settings.LLM_API_URL
+DEEPSEEK_MODEL   = settings.LLM_MODEL
 
 def get_api_key() -> str:
-    key = os.environ.get("DEEPSEEK_API_KEY", "sk-5862bc49ea6342d59fd0560890a96fdf")
+    key = settings.LLM_API_KEY
     if not key:
         raise RuntimeError("DEEPSEEK_API_KEY environment variable not set")
     return key
