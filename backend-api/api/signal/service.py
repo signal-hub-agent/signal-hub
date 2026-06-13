@@ -1,145 +1,65 @@
-"""
-信号参谋 - API 业务服务层
-职责：纯读 ClickHouse 金表，结合 Redis 缓存控制 LLM 文本
-"""
 import json
 import logging
 from datetime import datetime
 from fastapi import HTTPException
-
-from core.db_clickhouse import get_ch_client
 from core.redis_client import get_redis_client
-from llm_engine.deepseek_client import generate_token_signal_report
-from .schemas import TokenSignalResponse, ComponentScores
+from llm_engine.llm_client import request_llm_json
+
+from .repository import SignalRepository
+from .calculation import SignalCalculation
+from .schemas import TokenSignalResponse
 
 logger = logging.getLogger(__name__)
 
 class SignalService:
     @staticmethod
     def get_available_tokens() -> list:
-        """Returns a list of tokens that have data in the database."""
-        client = get_ch_client()
-
-        # Try Gold layer first
-        try:
-            rows = client.query("""
-                SELECT DISTINCT token_symbol
-                FROM signal_hub.gold_token_metrics_1h
-                ORDER BY token_symbol LIMIT 50
-            """).result_rows
-            tokens = [r[0] for r in rows if r[0]]
-            if tokens:
-                return tokens
-        except Exception as e:
-            logger.debug(f"Failed to fetch from gold layer: {e}")
-
-        # Fallback to dune_swaps
-        try:
-            rows = client.query("""
-                SELECT upper(token_bought_symbol) AS token, COUNT() AS cnt
-                FROM web3_data.dune_swaps
-                GROUP BY token ORDER BY cnt DESC LIMIT 50
-            """).result_rows
-            return [r[0] for r in rows if r[0]]
-        except Exception as e:
-            logger.error(f"Failed to fetch available tokens: {e}")
-            return []
+        tokens = SignalRepository.get_tokens_from_gold()
+        if not tokens:
+            tokens = SignalRepository.get_tokens_from_dune()
+        return tokens
 
     @staticmethod
     async def analyze_token(token: str, force_refresh: bool = False) -> TokenSignalResponse:
-        """
-        Fetches signal metrics from ClickHouse and LLM report from Redis.
-        """
-        client = get_ch_client()
         redis = await get_redis_client()
         token_symbol = token.upper()
         llm_cache_key = f"signalhub:llm:token:{token_symbol}"
 
-        # ---------------------------------------------------------
-        # Step 1: 极速读取 ClickHouse (0 计算)
-        # ---------------------------------------------------------
-        query_gold = """
-            SELECT
-                *
-            FROM signal_hub.gold_token_metrics_1h
-            WHERE upper(token_symbol) = {token:String}
-            ORDER BY calc_time DESC LIMIT 1
-        """
-        try:
-            result = client.query(query_gold, parameters={"token": token_symbol})
-            if not result.result_rows:
-                raise HTTPException(status_code=404, detail=f"No signal data found for token {token_symbol}")
-            row = dict(zip(result.column_names, result.result_rows[0]))
-        except Exception as e:
-            if isinstance(e, HTTPException): raise
-            logger.error(f"CH Query failed for {token_symbol}: {e}")
-            raise HTTPException(status_code=500, detail="Database error")
+        # 1. Repo: 取数据
+        row = SignalRepository.get_token_gold_metrics(token_symbol)
+        if not row:
+            raise HTTPException(status_code=404, detail=f"No signal data found for token {token_symbol}")
 
-        # ---------------------------------------------------------
-        # Step 2: 组装 Components 契约
-        # ---------------------------------------------------------
-        components = ComponentScores(
-            volume_trend={
-                "label": "Volume Trend", "score": int(row.get('volume_score', 0)), "max_score": 15,
-                "details": {
-                    "volume_24h_usd": row.get('volume_24h_usd'),
-                    "volume_7d_avg_usd": row.get('volume_7d_avg_usd'),
-                    "ratio": row.get('volume_ratio'),
-                    "tx_count_24h": row.get('tx_count_24h')
-                }
-            },
-            mev_toxicity={
-                "label": "MEV Toxicity", "score": int(row.get('mev_score', 0)), "max_score": 25,
-                "details": {
-                    "toxicity_pct": row.get('mev_toxicity_pct'),
-                    "mev_suspicious_txs": row.get('mev_suspicious_txs'),
-                    "mev_total_txs": row.get('mev_total_txs')
-                }
-            },
-            contract_safety={
-                "label": "Contract Safety", "score": int(row.get('contract_score', 28)), "max_score": 30,
-                "details": {"risk_items": ["Checked OK"]}
-            },
-            technical_bias={
-                "label": "Technical Bias", "score": int(row.get('tech_score', 0)), "max_score": 30,
-                "details": {
-                    "ma_trend": row.get('ma_trend_type'),
-                    "ma_alignment": row.get('ma_alignment'),
-                    "rsi_zone": row.get('rsi_zone'),
-                    "rsi_value": float(row.get('rsi_value', 50.0)),
-                    "macd_position": row.get('macd_position'),
-                    "macd_histogram_trend": row.get('macd_histogram_trend'),
-                    "macd_divergence": row.get('macd_divergence'),
-                    "bollinger_pattern": row.get('bollinger_pattern'),
-                    "bollinger_support": float(row.get('bollinger_support', 0.0)),
-                    "bollinger_resistance": float(row.get('bollinger_resistance', 0.0))
-                }
-            }
-        )
+        # 2. Calc: 构建组件
+        components = SignalCalculation.build_components(row)
 
-        # ---------------------------------------------------------
-        # Step 3: Redis LLM 缓存与按需触发
-        # ---------------------------------------------------------
+        # 3. LLM / Cache
         llm_report = None
         if force_refresh:
             await redis.delete(llm_cache_key)
         else:
-            llm_report = await redis.get(llm_cache_key)
+            cached = await redis.get(llm_cache_key)
+            if cached:
+                llm_report = json.loads(cached)
 
         if not llm_report:
             logger.info(f"LLM Cache miss for token {token_symbol}, generating...")
-            llm_report = await generate_token_signal_report(row)
-            await redis.setex(llm_cache_key, 86400, llm_report) # 缓存 24 小时
+            try:
+                system_prompt = SignalCalculation.TOKEN_SYSTEM_PROMPT
+                user_prompt = SignalCalculation.build_llm_user_prompt(row)
+                llm_report = await request_llm_json(system_prompt, user_prompt, max_tokens=500)
+                await redis.setex(llm_cache_key, 86400, json.dumps(llm_report))
+            except Exception as e:
+                logger.error(f"Failed to generate LLM report: {e}")
+                llm_report = {"summary": "Technical analysis temporarily unavailable.", "bias": "NEUTRAL"}
 
-        # ---------------------------------------------------------
-        # Step 4: 返回前端契约
-        # ---------------------------------------------------------
+        # 4. Assembling Response
         return TokenSignalResponse(
             token_symbol=token_symbol,
             current_price=row.get('current_price', 0.0),
             total_score=int(row.get('composite_score', 0)),
             signal_color=row.get('signal_color', 'yellow'),
-            llm_report=llm_report,
+            llm_report=json.dumps(llm_report), # 前端需要 stringified JSON
             components=components,
             generated_at=datetime.utcnow()
         )
