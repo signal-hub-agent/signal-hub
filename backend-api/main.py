@@ -15,7 +15,7 @@ from api.alerts import router as alerts_router
 from api.detective.router import router as detective_router
 from api.signal.router import router as signal_router
 # from api.dashboard.router import router as dashboard_router # 如果首页聚合也抽成了独立模块
-
+from api.dashboard.router import router as dashboard_router
 from api.bot.router import router as bot_router
 import asyncio
 from workers.alert_router import AlertRouterWorker
@@ -50,11 +50,11 @@ app.add_middleware(
     allow_headers=["*"],
 )
 # 挂载路由 (Routers)
-app.include_router(detective_router)
-app.include_router(signal_router)
+app.include_router(detective_router, prefix="/api/v1/detective", tags=["Detective"])
+app.include_router(signal_router, prefix="/api/v1/signal", tags=["Signal"])
 app.include_router(alerts_router.router, prefix="/api/v1/alerts", tags=["Alerts"])
 app.include_router(bot_router, prefix="/api/v1/bot", tags=["Telegram Bot"])
-# app.include_router(dashboard_router)
+app.include_router(dashboard_router, prefix="/api/v1/dashboard", tags=["Dashboard"])
 
 @app.get("/health", tags=["System"])
 async def health_check():

@@ -15,10 +15,7 @@ from .schemas import (
 
 logger = logging.getLogger(__name__)
 
-router = APIRouter(
-    prefix="/api/v1/detective",
-    tags=["Address Detective"]
-)
+router = APIRouter()
 
 @router.get("/top100", response_model=Top100Response)
 async def get_top_100_traders():

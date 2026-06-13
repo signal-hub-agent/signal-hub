@@ -189,8 +189,21 @@ class AlertRouterWorker:
                             f"*(Threshold setting: ${threshold:,.2f})*"
                         )
 
-            # =========== 触发发送 ===========
+            # =========== 触发发送与埋点 ===========
             if is_triggered and alert_message:
                 logger.info(f"Triggering TG alert to {chat_id} for event {event_type}")
-                # 异步发送 TG 消息，不阻塞后续分发
+                # 1. 异步发送 TG 消息
                 asyncio.create_task(send_tg_message(chat_id, alert_message))
+
+                # 2. 🌟 新增：大屏今日告警数统计 (Redis 埋点)
+                try:
+                    from datetime import datetime
+                    from core.redis_client import get_redis_client
+                    redis_client = await get_redis_client()
+                    today_str = datetime.utcnow().strftime('%Y%m%d')
+                    kpi_key = f"dashboard:alerts_today:{today_str}"
+                    # 计数器 +1，并设置 48 小时自动过期（防止内存泄漏）
+                    await redis_client.incr(kpi_key)
+                    await redis_client.expire(kpi_key, 172800)
+                except Exception as e:
+                    logger.error(f"Failed to increment dashboard alert KPI: {e}")

@@ -5,10 +5,7 @@ from .schemas import TokenSignalResponse
 
 logger = logging.getLogger(__name__)
 
-router = APIRouter(
-    prefix="/api/v1/signal",
-    tags=["Token Signal"]
-)
+router = APIRouter()
 
 @router.get("/{token}", response_model=TokenSignalResponse)
 async def get_token_signal(

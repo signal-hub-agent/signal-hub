@@ -231,7 +231,7 @@ Rules:
 async def generate_token_signal_report(token_data: dict) -> str:
     logger.info("Calling DeepSeek for token signal analysis...")
     headers = {"Authorization": f"Bearer {get_api_key()}", "Content-Type": "application/json"}
-    prompt = f"Write a technical brief for this token data.\nFollow the exact format from your instructions.\n\nData:\n{json.dumps(token_data, indent=2)}"
+    prompt = f"Write a technical brief for this token data.\nFollow the exact format from your instructions.\n\nData:\n{json.dumps(token_data, indent=2, default=str)}"
     payload = {"model": DEEPSEEK_MODEL, "messages": [{"role": "system", "content": TOKEN_SYSTEM_PROMPT}, {"role": "user", "content": prompt}], "max_tokens": 500, "temperature": 0.2}
 
     try:
