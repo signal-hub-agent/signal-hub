@@ -65,7 +65,7 @@ async def mock_kafka_stream():
             print(f"📡 已发送 {is_sub}: {event_type} - {mock_alert['data']['usd_value']} USD (地址: {target_address[:10]}...)")
 
             # 随机等待 1 到 4 秒（原先这里是 10 到 30 秒，为了方便你快速测试 TG，我改成了 2 到 5 秒）
-            await asyncio.sleep(random.uniform(2.0, 5.0))
+            await asyncio.sleep(random.uniform(10.0, 20.0))
 
     except asyncio.CancelledError:
         pass

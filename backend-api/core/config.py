@@ -5,7 +5,8 @@ from pydantic_settings import BaseSettings
 class Settings(BaseSettings):
     PROJECT_NAME: str = "SignalForge API"
     VERSION: str = "1.0.0"
-
+    PUBLISHER_PRIVATE_KEY: str = os.getenv("PUBLISHER_PRIVATE_KEY", "")
+    CONTRACT_ADDRESS: str = os.getenv("CONTRACT_ADDRESS", "")
     # ClickHouse Configuration
     CH_HOST: str = os.getenv("CH_HOST", "localhost")
     CH_PORT: int = int(os.getenv("CH_PORT", 8123))
