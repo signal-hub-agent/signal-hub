@@ -53,24 +53,24 @@ class BotService:
                     await redis.delete(f"tg_bind:{code}")
 
                     welcome_text = (
-                        f"✅ **绑定成功！**\n\n"
-                        f"您的邮箱 `{email}` 已成功关联此 Telegram 账号。\n"
-                        f"Signal Hub 实时流处理引擎已就绪，您将在这里第一时间收到链上高危事件与智能追踪告警。"
+                        f"✅ **Binding successful!**\n\n"
+                        f"Your email address `{email}` has been successfully linked to this Telegram account.\n"
+                        f"The Signal Hub real-time stream processing engine is ready, and you will receive alerts for high-risk on-chain events and intelligent tracking here immediately."
                     )
                     await send_tg_message(chat_id, welcome_text)
                     return True
                 else:
-                    await send_tg_message(chat_id, "❌ **绑定失败**：验证码无效或已过期(10分钟)，请在网页端重新生成。")
+                    await send_tg_message(chat_id, "❌ **Binding failed**: The verification code is invalid or has expired (10 minutes). Please regenerate it on the web page.")
                     return False
             else:
-                await send_tg_message(chat_id, "ℹ️ 格式错误。请发送完整的绑定命令，例如：`/bind 123456`")
+                await send_tg_message(chat_id, "ℹ️ Incorrect format. Please send the complete binding command, for example: `/bind 123456`")
                 return False
 
         elif text == "/start":
             start_text = (
-                "👋 **欢迎使用 Signal Hub 流处理告警终端！**\n\n"
-                "要开始接收告警，请在平台网页端获取 6 位绑定码，并在此回复：\n"
-                "`/bind 您的验证码`"
+                "👋 **Welcome to the Signal Hub Streaming Alarm Terminal!**\n\n"
+                "To start receiving alarms, please obtain a 6-digit binding code from the platform's web interface and reply here:\n"
+                "`/bind [Your verification code]`"
             )
             await send_tg_message(chat_id, start_text)
             return True
